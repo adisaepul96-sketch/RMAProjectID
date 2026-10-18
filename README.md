@@ -1,0 +1,3164 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RMA Project - Event & Wedding Organizer Financial & Calendar System</title>
+    <!-- Favicon -->
+    <link rel="icon" type="image/png" href="rma-logo-emblem.png">
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts: Playfair Display & Plus Jakarta Sans -->
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,600;0,700;1,400&family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        brand: {
+                            dark: '#1e1b12',
+                            card: '#fffdf7',
+                            slate: '#f5f0e8',
+                            accent: '#b8860b',
+                            rose: '#c5a059',
+                            gold: '#d4af37',
+                            light: '#fefce8',
+                        }
+                    },
+                    fontFamily: {
+                        serif: ['Playfair Display', 'serif'],
+                        sans: ['Plus Jakarta Sans', 'sans-serif'],
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background: linear-gradient(135deg, #fef9ee 0%, #fdf4d7 40%, #fef6e4 70%, #fffbf0 100%);
+            background-attachment: fixed;
+            color: #1a1509;
+        }
+        .serif-title {
+            font-family: 'Playfair Display', serif;
+        }
+        ::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #fef3c7;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #c5a059;
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #b8860b;
+        }
+        .glass-card {
+            background: rgba(255, 252, 240, 0.90);
+            backdrop-filter: blur(14px);
+            border: 1px solid rgba(196, 160, 89, 0.25);
+            box-shadow: 0 4px 24px rgba(180, 140, 40, 0.08);
+        }
+        .gold-gradient-btn {
+            background: linear-gradient(135deg, #d4af37 0%, #c5a059 50%, #b8860b 100%);
+        }
+        .gold-gradient-btn:hover {
+            background: linear-gradient(135deg, #e5be48 0%, #d6af68 50%, #c9971c 100%);
+        }
+        @media print {
+            body {
+                background-color: #ffffff !important;
+                color: #0f172a !important;
+                margin: 0 !important;
+                padding: 0 !important;
+                -webkit-print-color-adjust: exact !important;
+                print-color-adjust: exact !important;
+            }
+            #loginScreen, header, .no-print, #toast, #transactionModal, #dayDetailModal, #resetConfirmModal, .action-btns, #invoiceCustomizerControls, #invoiceModalHeader {
+                display: none !important;
+            }
+            .glass-card {
+                background: #ffffff !important;
+                border: none !important;
+                color: #0f172a !important;
+                box-shadow: none !important;
+            }
+            /* Mode Cetak Invoice Customer Resmi */
+            body.print-invoice-mode #projectResumeModal {
+                display: none !important;
+            }
+            body.print-invoice-mode #invoiceCustomizerModal {
+                display: block !important;
+                position: static !important;
+                inset: auto !important;
+                background: #ffffff !important;
+                padding: 0 !important;
+                margin: 0 !important;
+                width: 100% !important;
+                height: auto !important;
+                overflow: visible !important;
+            }
+            body.print-invoice-mode #invoiceCustomizerModal > .glass-card {
+                background: #ffffff !important;
+                border: none !important;
+                box-shadow: none !important;
+                padding: 0 !important;
+                margin: 0 !important;
+                width: 100% !important;
+                max-width: 100% !important;
+            }
+            body.print-invoice-mode #invoicePreviewScrollWrapper {
+                display: block !important;
+                padding: 0 !important;
+                margin: 0 !important;
+                background: #ffffff !important;
+                overflow: visible !important;
+                max-height: none !important;
+                width: 100% !important;
+            }
+            body.print-invoice-mode #printableInvoiceDoc {
+                display: block !important;
+                margin: 0 auto !important;
+                padding: 20px 24px !important;
+                box-shadow: none !important;
+                border: none !important;
+                width: 100% !important;
+                max-width: 100% !important;
+                background: #ffffff !important;
+                color: #0f172a !important;
+                page-break-after: avoid !important;
+            }
+            /* Default fallback untuk cetak resume keuangan jika bukan invoice mode */
+            body:not(.print-invoice-mode) #projectResumeModal {
+                position: absolute !important;
+                left: 0 !important;
+                top: 0 !important;
+                width: 100% !important;
+                height: auto !important;
+                background: #fff !important;
+                color: #000 !important;
+                display: block !important;
+            }
+        }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col justify-between antialiased selection:bg-amber-500 selection:text-slate-950">
+
+    <!-- LOGIN SCREEN -->
+    <div id="loginScreen" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/95 backdrop-blur-md">
+        <div class="glass-card w-full max-w-md p-8 rounded-3xl shadow-2xl border border-amber-500/30 relative overflow-hidden">
+            <div class="absolute -top-12 -right-12 w-36 h-36 bg-amber-500/10 rounded-full blur-2xl pointer-events-none"></div>
+            <div class="absolute -bottom-12 -left-12 w-36 h-36 bg-rose-500/10 rounded-full blur-2xl pointer-events-none"></div>
+
+            <div class="text-center space-y-3 mb-8">
+                <div class="inline-flex items-center justify-center p-3.5 sm:p-4 rounded-3xl bg-white shadow-2xl shadow-amber-500/15 border border-amber-300/50 backdrop-blur-md">
+                    <img src="rma-logo-full.png" alt="RMA Project Wedding & Event Organizer" class="h-16 sm:h-20 w-auto object-contain">
+                </div>
+                <h2 class="serif-title text-xl sm:text-2xl font-bold tracking-wide text-amber-200">FINANCIAL SYSTEM</h2>
+                <p class="text-[11px] text-slate-400 tracking-widest uppercase">Wedding & Event Organizer Management</p>
+            </div>
+
+            <form id="loginForm" onsubmit="handleLogin(event)" class="space-y-5">
+                <div>
+                    <label class="block text-xs font-medium text-slate-300 mb-1.5">Username</label>
+                    <div class="relative">
+                        <i class="fa-solid fa-user absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-500 text-xs"></i>
+                        <input type="text" id="loginUsername" required placeholder="Masukkan username (rmaproject)" class="w-full bg-slate-900 border border-slate-700 rounded-xl pl-9 pr-3 py-2.5 text-xs text-slate-100 focus:outline-none focus:border-amber-400 transition">
+                    </div>
+                </div>
+
+                <div>
+                    <label class="block text-xs font-medium text-slate-300 mb-1.5">Password</label>
+                    <div class="relative">
+                        <i class="fa-solid fa-lock absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-500 text-xs"></i>
+                        <input type="password" id="loginPassword" required placeholder="Masukkan password (rmaproject)" class="w-full bg-slate-900 border border-slate-700 rounded-xl pl-9 pr-3 py-2.5 text-xs text-slate-100 focus:outline-none focus:border-amber-400 transition">
+                    </div>
+                </div>
+
+                <div class="flex items-center justify-between text-xs text-slate-400 pt-1">
+                    <label class="flex items-center gap-2 cursor-pointer select-none">
+                        <input type="checkbox" id="rememberMe" class="rounded bg-slate-900 border-slate-700 text-amber-500 focus:ring-0">
+                        <span>Ingat saya (Remember Me)</span>
+                    </label>
+                </div>
+
+                <button type="submit" class="w-full py-3 rounded-xl gold-gradient-btn text-slate-950 font-bold text-xs uppercase tracking-wider shadow-lg hover:scale-[1.02] transition duration-200">
+                    Masuk ke Dashboard System
+                </button>
+            </form>
+
+            <div class="mt-6 text-center text-[11px] text-slate-500">
+                <p>Protected Access Area • RMA Project Event Organizer</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- MAIN APP WRAPPER -->
+    <div id="mainApp" class="hidden min-h-screen flex flex-col justify-between">
+
+        <!-- HEADER / NAVIGATION -->
+        <header class="sticky top-0 z-40 bg-white/95 backdrop-blur-md border-b border-amber-300/40 px-4 lg:px-8 py-3.5 shadow-md shadow-amber-100/60">
+            <div class="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-4">
+                <div class="flex items-center gap-3">
+                    <div class="w-11 h-11 rounded-2xl bg-white p-1 flex items-center justify-center border border-amber-300/60 shadow-md shadow-amber-500/10 shrink-0">
+                        <img src="rma-logo-emblem.png" alt="RMA Project Logo" class="w-full h-full object-contain">
+                    </div>
+                    <div>
+                        <h1 class="serif-title text-lg sm:text-xl font-bold tracking-wide text-amber-200">
+                            RMA PROJECT
+                        </h1>
+                        <p class="text-[10px] text-slate-400 tracking-widest uppercase">Wedding & Event Management & Project Resume</p>
+                    </div>
+                </div>
+
+                <!-- Header Actions -->
+                <div class="flex items-center gap-2.5 w-full sm:w-auto justify-end flex-wrap no-print">
+                    <button onclick="openModal('PEMASUKAN')" class="px-3.5 py-2 rounded-xl gold-gradient-btn text-slate-950 font-bold text-xs flex items-center justify-center gap-2 shadow-lg hover:scale-105 transition">
+                        <i class="fa-solid fa-circle-plus"></i>
+                        <span>+ Input Project / Pemasukan</span>
+                    </button>
+                    <button onclick="openModal('PENGELUARAN')" class="px-3.5 py-2 rounded-xl bg-rose-50 hover:bg-rose-100 text-rose-700 border border-rose-300 text-xs font-semibold flex items-center justify-center gap-2 transition">
+                        <i class="fa-solid fa-minus-circle"></i>
+                        <span>+ Pengeluaran Vendor</span>
+                    </button>
+                    <button onclick="openResetModal()" class="px-3 py-2 rounded-xl bg-rose-950/60 hover:bg-rose-900/80 text-rose-300 border border-rose-500/40 text-xs font-medium flex items-center gap-1.5 transition" title="Kosongkan Database">
+                        <i class="fa-solid fa-trash-arrow-up"></i>
+                        <span class="hidden md:inline">Reset Database</span>
+                    </button>
+                    <button onclick="handleLogout()" class="px-3 py-2 rounded-xl bg-slate-800 hover:bg-rose-500/20 text-rose-400 border border-rose-500/30 text-xs font-medium flex items-center gap-1.5 transition" title="Logout System">
+                        <i class="fa-solid fa-right-from-bracket"></i>
+                        <span class="hidden sm:inline">Logout</span>
+                    </button>
+                </div>
+            </div>
+        </header>
+
+        <!-- MAIN DASHBOARD CONTENT -->
+        <main class="max-w-7xl w-full mx-auto px-4 lg:px-8 py-6 flex-grow space-y-6">
+
+            <!-- 1. RINGKASAN STATISTIK FINANSIAL PROJECT -->
+            <section class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
+                <!-- Total Omset / Nilai Project -->
+                <div class="glass-card p-4 rounded-2xl relative overflow-hidden group hover:border-amber-500/40 transition">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <p class="text-[10px] uppercase tracking-wider text-amber-800/70 font-medium">Total Nilai Project (Omset)</p>
+                            <h2 id="totalContractValue" class="text-base lg:text-lg font-bold text-amber-700 mt-1">Rp 0</h2>
+                        </div>
+                        <div class="w-9 h-9 rounded-xl bg-amber-100 border border-amber-300/60 flex items-center justify-center text-amber-700 text-sm">
+                            <i class="fa-solid fa-file-contract"></i>
+                        </div>
+                    </div>
+                    <p class="mt-2 text-[10px] text-amber-700/60"><span class="text-amber-700 font-semibold"><i class="fa-solid fa-calculator mr-1"></i>Akumulasi</span> Kontrak Project</p>
+                </div>
+
+                <!-- Total Cash In (Terbayar) -->
+                <div class="glass-card p-4 rounded-2xl relative overflow-hidden group hover:border-emerald-500/40 transition">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <p class="text-[10px] uppercase tracking-wider text-slate-400 font-medium">Uang Masuk (Cash In)</p>
+                            <h2 id="totalIncome" class="text-base lg:text-lg font-bold text-emerald-400 mt-1">Rp 0</h2>
+                        </div>
+                        <div class="w-9 h-9 rounded-xl bg-emerald-500/10 border border-emerald-500/30 flex items-center justify-center text-emerald-400 text-sm">
+                            <i class="fa-solid fa-money-bill-wave"></i>
+                        </div>
+                    </div>
+                    <p class="mt-2 text-[10px] text-slate-400"><span class="text-emerald-400 font-semibold"><i class="fa-solid fa-circle-check mr-1"></i>Real Klien</span> DP & Pelunasan</p>
+                </div>
+
+                <!-- Total Piutang (Sisa Tagihan) -->
+                <div class="glass-card p-4 rounded-2xl relative overflow-hidden group hover:border-sky-400/60 transition">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <p class="text-[10px] uppercase tracking-wider text-sky-800/70 font-medium">Sisa Piutang Klien</p>
+                            <h2 id="pendingAmount" class="text-base lg:text-lg font-bold text-sky-700 mt-1">Rp 0</h2>
+                        </div>
+                        <div class="w-9 h-9 rounded-xl bg-sky-100 border border-sky-300/60 flex items-center justify-center text-sky-700 text-sm">
+                            <i class="fa-solid fa-clock-rotate-left"></i>
+                        </div>
+                    </div>
+                    <p class="mt-2 text-[10px] text-sky-800/60"><span class="text-sky-700 font-semibold"><i class="fa-solid fa-hourglass-half mr-1"></i>Belum Lunas</span> Tagihan Klien</p>
+                </div>
+
+                <!-- Total Pengeluaran -->
+                <div class="glass-card p-4 rounded-2xl relative overflow-hidden group hover:border-rose-400/60 transition">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <p class="text-[10px] uppercase tracking-wider text-rose-800/70 font-medium">Pengeluaran Vendor / Ops</p>
+                            <h2 id="totalExpense" class="text-base lg:text-lg font-bold text-rose-700 mt-1">Rp 0</h2>
+                        </div>
+                        <div class="w-9 h-9 rounded-xl bg-rose-100 border border-rose-300/60 flex items-center justify-center text-rose-700 text-sm">
+                            <i class="fa-solid fa-receipt"></i>
+                        </div>
+                    </div>
+                    <p class="mt-2 text-[10px] text-rose-800/60"><span class="text-rose-700 font-semibold"><i class="fa-solid fa-circle-down mr-1"></i>Vendor/Operasional</span> Acara</p>
+                </div>
+
+                <!-- Saldo Bersih Realistis -->
+                <div class="glass-card p-4 rounded-2xl relative overflow-hidden group hover:border-purple-400/60 transition">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <p class="text-[10px] uppercase tracking-wider text-purple-800/70 font-medium">Laba Kas Realistis</p>
+                            <h2 id="netProfit" class="text-base lg:text-lg font-bold text-purple-700 mt-1">Rp 0</h2>
+                        </div>
+                        <div class="w-9 h-9 rounded-xl bg-purple-100 border border-purple-300/60 flex items-center justify-center text-purple-700 text-sm">
+                            <i class="fa-solid fa-wallet"></i>
+                        </div>
+                    </div>
+                    <p class="mt-2 text-[10px] text-purple-800/60"><span id="profitStatusBadge" class="px-1.5 py-0.5 rounded text-[9px] font-semibold bg-purple-100 text-purple-700 border border-purple-300">Cash In - Expense</span></p>
+                </div>
+            </section>
+
+            <!-- 2. MAIN DASHBOARD GRID: KALENDER EVENT INTEGRATED & SIDE PANEL -->
+            <section class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+
+                <!-- SISI KIRI (2 COLS): KALENDER EVENT -->
+                <div class="glass-card p-5 rounded-2xl lg:col-span-2 flex flex-col justify-between space-y-4">
+                    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-amber-200/60">
+                        <div>
+                            <h3 class="serif-title text-lg font-bold text-amber-800 flex items-center gap-2">
+                                <i class="fa-regular fa-calendar-check text-amber-600"></i>
+                                <span>Kalender Schedule Event</span>
+                            </h3>
+                            <p class="text-xs text-amber-700/60">Klik pada tanggal/event untuk membuka Resume Project detail</p>
+                        </div>
+                        <div class="flex items-center gap-2">
+                            <button onclick="changeMonth(-1)" class="p-2 rounded-xl bg-amber-50 hover:bg-amber-100 text-amber-800 border border-amber-200 text-xs transition">
+                                <i class="fa-solid fa-chevron-left"></i>
+                            </button>
+                            <span id="calendarMonthYear" class="serif-title text-sm font-bold text-amber-800 min-w-[120px] text-center">Oktober 2026</span>
+                            <button onclick="changeMonth(1)" class="p-2 rounded-xl bg-amber-50 hover:bg-amber-100 text-amber-800 border border-amber-200 text-xs transition">
+                                <i class="fa-solid fa-chevron-right"></i>
+                            </button>
+                            <button onclick="resetToCurrentMonth()" class="px-2.5 py-2 rounded-xl bg-amber-500/20 text-amber-700 border border-amber-400/40 text-xs font-semibold hover:bg-amber-500/30 transition" title="Bulan Ini">
+                                Hari Ini
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Days Header -->
+                    <div class="grid grid-cols-7 gap-1 text-center font-bold text-[11px] text-amber-700/80 uppercase">
+                        <div class="py-1 text-rose-600">Min</div>
+                        <div class="py-1">Sen</div>
+                        <div class="py-1">Sel</div>
+                        <div class="py-1">Rab</div>
+                        <div class="py-1">Kam</div>
+                        <div class="py-1">Jum</div>
+                        <div class="py-1 text-amber-700">Sab</div>
+                    </div>
+
+                    <!-- Calendar Grid Container -->
+                    <div id="calendarGrid" class="grid grid-cols-7 gap-1.5 text-xs min-h-[320px]">
+                        <!-- Populated dynamically -->
+                    </div>
+
+                    <!-- Legend Status Kategori & Pembayaran -->
+                    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pt-3 border-t border-amber-200/60 text-[11px] text-amber-800/60">
+                        <div class="flex flex-wrap items-center gap-3">
+                            <span class="font-medium text-amber-800">Kategori:</span>
+                            <div class="flex items-center gap-1.5">
+                                <span class="w-2.5 h-2.5 rounded-full bg-rose-400"></span>
+                                <span>Wedding</span>
+                            </div>
+                            <div class="flex items-center gap-1.5">
+                                <span class="w-2.5 h-2.5 rounded-full bg-amber-400"></span>
+                                <span>Tunangan</span>
+                            </div>
+                            <div class="flex items-center gap-1.5">
+                                <span class="w-2.5 h-2.5 rounded-full bg-sky-400"></span>
+                                <span>Event Lainnya</span>
+                            </div>
+                        </div>
+
+                        <div class="flex flex-wrap items-center gap-3">
+                            <span class="font-medium text-amber-800">Status Pembayaran:</span>
+                            <span class="px-1.5 py-0.5 rounded text-[9px] bg-emerald-500/20 text-emerald-300 border border-emerald-500/40">Lunas</span>
+                            <span class="px-1.5 py-0.5 rounded text-[9px] bg-amber-500/20 text-amber-300 border border-amber-500/40">DP / Parsial</span>
+                            <span class="px-1.5 py-0.5 rounded text-[9px] bg-rose-500/20 text-rose-300 border border-rose-500/40">Pending</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- SISI KANAN (1 COL): QUICK PANEL & PROJECT TERDEKAT -->
+                <div class="space-y-6">
+                    <div class="glass-card p-5 rounded-2xl space-y-3">
+                        <h4 class="serif-title text-sm font-bold text-amber-800 flex items-center gap-2">
+                            <i class="fa-solid fa-bolt text-amber-600"></i>
+                            <span>Aksi Cepat Project</span>
+                        </h4>
+                        <div class="grid grid-cols-2 gap-2">
+                            <button onclick="openModal('PEMASUKAN')" class="p-3 rounded-xl bg-amber-50 hover:bg-amber-100 border border-amber-300 text-amber-800 flex flex-col items-center justify-center text-center transition">
+                                <i class="fa-solid fa-file-signature text-lg mb-1"></i>
+                                <span class="text-xs font-semibold">+ Project Baru</span>
+                            </button>
+                            <button onclick="openModal('PENGELUARAN')" class="p-3 rounded-xl bg-rose-50 hover:bg-rose-100 border border-rose-200 text-rose-700 flex flex-col items-center justify-center text-center transition">
+                                <i class="fa-solid fa-receipt text-lg mb-1"></i>
+                                <span class="text-xs font-semibold">+ Pengeluaran Vendor</span>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Upcoming Projects Panel -->
+                    <div class="glass-card p-5 rounded-2xl flex flex-col justify-between space-y-3">
+                        <div class="flex items-center justify-between pb-2 border-b border-amber-200/60">
+                            <h4 class="serif-title text-sm font-bold text-amber-800 flex items-center gap-2">
+                                <i class="fa-solid fa-champagne-glasses text-amber-600"></i>
+                                <span>Project Terdekat</span>
+                            </h4>
+                            <span class="text-[10px] bg-amber-50 text-amber-700 px-2 py-0.5 rounded-full border border-amber-200">Upcoming</span>
+                        </div>
+
+                        <div id="upcomingEventsList" class="space-y-2.5 max-h-[290px] overflow-y-auto pr-1">
+                            <!-- Populated dynamically -->
+                        </div>
+                    </div>
+                </div>
+
+            </section>
+
+            <!-- 3. GRAFIK KEUANGAN & KATEGORI EVENT -->
+            <section class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                <div class="glass-card p-5 rounded-2xl lg:col-span-2 flex flex-col justify-between">
+                    <div class="flex items-center justify-between mb-3">
+                        <div>
+                            <h3 class="serif-title text-base font-bold text-amber-100">Trend Nilai Project vs Uang Masuk</h3>
+                            <p class="text-xs text-slate-400">Perbandingan Total Nilai Kontrak, Uang Diterima & Pengeluaran</p>
+                        </div>
+                        <span class="text-xs bg-slate-800 text-slate-300 px-3 py-1 rounded-full border border-slate-700">2026</span>
+                    </div>
+                    <div class="relative w-full h-56">
+                        <canvas id="financialChart"></canvas>
+                    </div>
+                </div>
+
+                <div class="glass-card p-5 rounded-2xl flex flex-col justify-between">
+                    <div class="mb-3">
+                        <h3 class="serif-title text-base font-bold text-amber-100">Distribusi Kategori Acara</h3>
+                        <p class="text-xs text-slate-400">Proporsi Nilai Kontrak per Jenis Event</p>
+                    </div>
+                    <div class="relative w-full h-48 flex items-center justify-center">
+                        <canvas id="categoryChart"></canvas>
+                    </div>
+                </div>
+            </section>
+
+            <!-- 4. TABEL RIWAYAT TRANSAKSI & RESUME PROJECT -->
+            <section class="glass-card p-6 rounded-2xl space-y-4">
+                <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-4 border-b border-slate-700/60">
+                    <div>
+                        <h3 class="serif-title text-xl font-bold text-amber-200">Daftar Project & Catatan Finansial</h3>
+                        <p class="text-xs text-slate-400">Klik "Resume" pada baris project untuk melihat detail lengkap & kwitansi</p>
+                    </div>
+                    <div class="flex flex-wrap items-center gap-2">
+                        <button onclick="exportToCSV()" class="px-3 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-medium border border-slate-700 flex items-center gap-2 transition">
+                            <i class="fa-solid fa-file-csv text-emerald-400"></i>
+                            <span>Ekspor CSV</span>
+                        </button>
+                        <button onclick="window.print()" class="px-3 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-medium border border-slate-700 flex items-center gap-2 transition">
+                            <i class="fa-solid fa-print text-amber-400"></i>
+                            <span>Cetak Laporan</span>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Filter Controls -->
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3 pt-1">
+                    <div class="relative">
+                        <i class="fa-solid fa-magnifying-glass absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-xs"></i>
+                        <input type="text" id="searchInput" oninput="applyFilters()" placeholder="Cari Klien / Venue / Catatan..." class="w-full bg-slate-900/80 border border-slate-700 rounded-xl pl-9 pr-3 py-2 text-xs text-slate-200 focus:outline-none focus:border-amber-400">
+                    </div>
+
+                    <div>
+                        <select id="eventCategoryFilter" onchange="applyFilters()" class="w-full bg-slate-900/80 border border-slate-700 rounded-xl px-3 py-2 text-xs text-slate-200 focus:outline-none focus:border-amber-400">
+                            <option value="ALL">Semua Kategori Acara</option>
+                            <option value="Wedding / Pernikahan">Wedding / Pernikahan</option>
+                            <option value="Engagement / Tunangan">Engagement / Tunangan</option>
+                            <option value="Event Lainnya">Event Lainnya</option>
+                        </select>
+                    </div>
+
+                    <div>
+                        <select id="typeFilter" onchange="applyFilters()" class="w-full bg-slate-900/80 border border-slate-700 rounded-xl px-3 py-2 text-xs text-slate-200 focus:outline-none focus:border-amber-400">
+                            <option value="ALL">Semua Jenis Record</option>
+                            <option value="PEMASUKAN">Project (Pemasukan)</option>
+                            <option value="PENGELUARAN">Pengeluaran Vendor</option>
+                        </select>
+                    </div>
+
+                    <div>
+                        <select id="categoryFilter" onchange="applyFilters()" class="w-full bg-slate-900/80 border border-slate-700 rounded-xl px-3 py-2 text-xs text-slate-200 focus:outline-none focus:border-amber-400">
+                            <option value="ALL">Semua Detail Finansial</option>
+                            <optgroup label="Pemasukan Project">
+                                <option value="Kontrak Package / All-In">Kontrak Package / All-In</option>
+                                <option value="Add-on / Service Tambahan">Add-on / Service Tambahan</option>
+                            </optgroup>
+                            <optgroup label="Pengeluaran Vendor">
+                                <option value="Catering">Catering</option>
+                                <option value="Dekorasi">Dekorasi</option>
+                                <option value="MUA & Attire">MUA & Attire</option>
+                                <option value="Sound & Lighting">Sound & Lighting</option>
+                                <option value="Entertainment & MC">Entertainment & MC</option>
+                                <option value="Venue / Gedung">Venue / Gedung</option>
+                                <option value="Fotografi & Videografi">Fotografi & Videografi</option>
+                                <option value="Operasional Tim WO">Operasional Tim WO</option>
+                                <option value="Lain-lain">Lain-lain</option>
+                            </optgroup>
+                        </select>
+                    </div>
+
+                    <div>
+                        <select id="statusFilter" onchange="applyFilters()" class="w-full bg-slate-900/80 border border-slate-700 rounded-xl px-3 py-2 text-xs text-slate-200 focus:outline-none focus:border-amber-400">
+                            <option value="ALL">Semua Status Bayar</option>
+                            <option value="Lunas">Lunas</option>
+                            <option value="DP">DP / Parsial</option>
+                            <option value="Pending">Pending / Belum Bayar</option>
+                        </select>
+                    </div>
+                </div>
+
+                <!-- TABEL DATA -->
+                <div class="overflow-x-auto rounded-xl border border-slate-700/60 mt-3">
+                    <table class="w-full text-left border-collapse">
+                        <thead class="bg-slate-900/90 text-slate-300 text-xs uppercase tracking-wider border-b border-slate-700">
+                            <tr>
+                                <th class="p-3">Tanggal</th>
+                                <th class="p-3">Nama Klien / Event</th>
+                                <th class="p-3">Kategori</th>
+                                <th class="p-3">Total Kontrak</th>
+                                <th class="p-3">Terbayar</th>
+                                <th class="p-3">Sisa Piutang</th>
+                                <th class="p-3">Status</th>
+                                <th class="p-3 text-center">Resume & Aksi</th>
+                            </tr>
+                        </thead>
+                        <tbody id="transactionTableBody" class="divide-y divide-slate-800 text-xs text-slate-300">
+                            <!-- Populated dynamically -->
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- Empty State -->
+                <div id="emptyState" class="hidden text-center py-12 space-y-3">
+                    <div class="w-16 h-16 rounded-full bg-slate-800 border border-slate-700 flex items-center justify-center mx-auto text-amber-400 text-2xl shadow-inner">
+                        <i class="fa-regular fa-folder-open"></i>
+                    </div>
+                    <div class="space-y-1">
+                        <p class="text-slate-300 font-bold text-sm">Belum Ada Project / Transaksi</p>
+                        <p class="text-slate-400 text-xs max-w-sm mx-auto">Database kosong. Klik tombol <span class="text-amber-300 font-semibold">'+ Input Project / Pemasukan'</span> di atas untuk memulai pencatatan baru.</p>
+                    </div>
+                </div>
+            </section>
+
+        </main>
+
+        <!-- FOOTER -->
+        <footer class="border-t border-amber-200/60 bg-amber-50/80 py-5 text-center text-xs text-amber-800/60 no-print">
+            <div class="max-w-7xl mx-auto px-4 flex flex-col sm:flex-row items-center justify-between gap-3">
+                <p>&copy; 2026 <span class="text-amber-200/80 font-medium">RMA Project - Wedding & Event Organizer</span>. Financial & Resume System.</p>
+                <button onclick="openResetModal()" class="text-rose-400/80 hover:text-rose-300 text-[11px] underline flex items-center gap-1 transition">
+                    <i class="fa-solid fa-trash-alt"></i>
+                    <span>Kosongkan Database System</span>
+                </button>
+            </div>
+        </footer>
+
+    </div>
+
+    <!-- MODAL 1: INPUT PROJECT / PEMASUKAN & PENGELUARAN -->
+    <div id="transactionModal" class="fixed inset-0 bg-slate-950/80 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+        <div class="glass-card w-full max-w-xl rounded-2xl shadow-2xl overflow-hidden border border-amber-500/30 transform transition-all max-h-[90vh] overflow-y-auto">
+            <div class="bg-slate-900/95 px-6 py-4 border-b border-slate-700 flex items-center justify-between sticky top-0 z-10">
+                <h3 id="modalTitle" class="serif-title text-lg font-bold text-amber-200 flex items-center gap-2">
+                    <i class="fa-solid fa-pen-to-square"></i>
+                    <span>Tambah Project / Input Pemasukan</span>
+                </h3>
+                <button onclick="closeModal()" class="text-slate-400 hover:text-rose-400 transition">
+                    <i class="fa-solid fa-xmark text-lg"></i>
+                </button>
+            </div>
+
+            <form id="transactionForm" onsubmit="handleFormSubmit(event)" class="p-6 space-y-4">
+                <input type="hidden" id="editId" value="">
+                <input type="hidden" id="formProjectId" value="">
+
+                <!-- JENIS INPUT & KATEGORI / PROJECT LINK -->
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-xs font-medium text-slate-300 mb-1">Jenis Input <span class="text-rose-400">*</span></label>
+                        <select id="formType" onchange="toggleFormFields()" required class="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-2 text-xs text-slate-100 focus:outline-none focus:border-amber-400">
+                            <option value="PEMASUKAN">Project Klien (Pemasukan)</option>
+                            <option value="PENGELUARAN">Pengeluaran Vendor / Ops</option>
+                        </select>
+                    </div>
+
+                    <!-- Kategori Acara (Untuk PEMASUKAN) -->
+                    <div id="incomeEventCategoryGroup">
+                        <label class="block text-xs font-medium text-slate-300 mb-1">Kategori Acara <span class="text-rose-400">*</span></label>
+                        <select id="formEventCategory" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-2 text-xs text-slate-100 focus:outline-none focus:border-amber-400">
+                            <option value="Wedding / Pernikahan">Wedding / Pernikahan</option>
+                            <option value="Engagement / Tunangan">Engagement / Tunangan</option>
+                            <option value="Event Lainnya">Event Lainnya (Siraman, Akad, Gathering, Corporate, etc)</option>
+                        </select>
+                    </div>
+
+                    <!-- Pilih Project Terkait (Untuk PENGELUARAN) -->
+                    <div id="expenseProjectSelectGroup" class="hidden">
+                        <label class="block text-xs font-medium text-slate-300 mb-1">Tautkan ke Project <span class="text-rose-400">*</span></label>
+                        <select id="formExpenseProjectSelect" onchange="handleExpenseProjectSelectChange()" class="w-full bg-slate-900 border border-rose-500/40 rounded-xl px-3 py-2 text-xs text-slate-100 focus:outline-none focus:border-rose-400 font-medium">
+                            <!-- Populated dynamically with registered projects -->
+                        </select>
+                    </div>
+                </div>
+
+                <!-- Banner Informasi Project yang Ditautkan -->
+                <div id="linkedProjectInfoBanner" class="hidden p-3 rounded-xl bg-amber-500/10 border border-amber-500/30 text-xs text-amber-200 flex items-center justify-between">
+                    <div class="flex items-center gap-2">
+                        <i class="fa-solid fa-link text-amber-400"></i>
+                        <span>Biaya ditautkan ke project: <strong id="linkedProjectName" class="text-amber-300 font-bold"></strong></span>
+                    </div>
+                    <span id="linkedProjectBadge" class="text-[10px] px-2 py-0.5 rounded bg-amber-500/20 text-amber-300 font-semibold"></span>
+                </div>
+
+                <!-- Field Nama Klien (Khusus PEMASUKAN atau Non-Project Expense) -->
+                <div id="incomeClientFieldsGroup" class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-xs font-medium text-slate-300 mb-1">Nama Klien / Project <span class="text-rose-400">*</span></label>
+                        <input type="text" id="formClient" placeholder="E.g. Romeo & Juliet / Akad Sarah & Budi" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-2 text-xs text-slate-100 focus:outline-none focus:border-amber-400">
+                    </div>
+
+                    <div>
+                        <label class="block text-xs font-medium text-slate-300 mb-1">Nomor WhatsApp Klien</label>
+                        <input type="text" id="formPhone" placeholder="E.g. 08123456789" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-2 text-xs text-slate-100 focus:outline-none focus:border-amber-400">
+                    </div>
+                </div>
+
+                <!-- FIELD SET PENGELUARAN VENDOR -->
+                <div id="expenseFieldsGroup" class="hidden p-4 rounded-xl bg-rose-500/10 border border-rose-500/30 space-y-3">
+                    <p class="text-[11px] font-bold text-rose-300 uppercase tracking-wider flex items-center gap-1.5">
+                        <i class="fa-solid fa-receipt text-rose-400"></i> Detail Pengeluaran Biaya Vendor
+                    </p>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                        <div>
+                            <label class="block text-xs font-medium text-slate-300 mb-1">Kategori Vendor <span class="text-rose-400">*</span></label>
+                            <select id="formCategory" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-2 text-xs text-slate-100 focus:outline-none focus:border-amber-400">
+                                <option value="Catering">Catering</option>
+                                <option value="Dekorasi">Dekorasi</option>
+                                <option value="MUA & Attire">MUA & Attire</option>
+                                <option value="Sound & Lighting">Sound & Lighting</option>
+                                <option value="Entertainment & MC">Entertainment & MC</option>
+                                <option value="Venue / Gedung">Venue / Gedung</option>
+                                <option value="Fotografi & Videografi">Fotografi & Videografi</option>
+                                <option value="Operasional Tim WO">Operasional Tim WO</option>
+                                <option value="Souvenir & Undangan">Souvenir & Undangan</option>
+                                <option value="Lain-lain">Lain-lain</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-xs font-medium text-slate-300 mb-1">Nama Vendor / Keterangan</label>
+                            <input type="text" id="formVendorName" placeholder="E.g. Catering Bu Mimin / Arya Decor / Tim WO" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-2 text-xs text-slate-100 focus:outline-none focus:border-amber-400">
+                        </div>
+                    </div>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                        <div>
+                            <label class="block text-xs font-medium text-slate-300 mb-1">Nominal Biaya (Rp) <span class="text-rose-400">*</span></label>
+                            <input type="number" id="formExpenseAmount" min="0" placeholder="0" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-2 text-xs text-rose-400 font-bold focus:outline-none focus:border-amber-400">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-medium text-slate-300 mb-1">Status Bayar ke Vendor</label>
+                            <select id="formExpenseStatus" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-2 text-xs text-slate-100 focus:outline-none focus:border-amber-400">
+                                <option value="Lunas">Lunas</option>
+                                <option value="DP">DP / Parsial</option>
+                                <option value="Pending">Pending / Belum Bayar</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-xs font-medium text-slate-300 mb-1">Tanggal Acara / Transaksi <span class="text-rose-400">*</span></label>
+                        <input type="date" id="formDate" required class="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-2 text-xs text-slate-100 focus:outline-none focus:border-amber-400">
+                    </div>
+
+                    <div id="incomeVenueGroup">
+                        <label class="block text-xs font-medium text-slate-300 mb-1">Lokasi / Venue Acara</label>
+                        <input type="text" id="formVenue" placeholder="E.g. BallRoom Hotel / Gedung / Home Venue" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-2 text-xs text-slate-100 focus:outline-none focus:border-amber-400">
+                    </div>
+                </div>
+
+                <!-- FIELD SET PEMASUKAN: NILAI PROJECT VS DITERIMA -->
+                <div id="incomeFieldsGroup" class="p-3.5 rounded-xl bg-amber-500/10 border border-amber-500/20 space-y-3">
+                    <p class="text-[11px] font-bold text-amber-200 uppercase tracking-wider"><i class="fa-solid fa-coins mr-1"></i>Detail Financial Kontrak Project</p>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                        <div>
+                            <label class="block text-xs font-medium text-slate-300 mb-1">Nilai Total Project / Kontrak (Rp) <span class="text-rose-400">*</span></label>
+                            <input type="number" id="formTotalProjectValue" min="0" oninput="calculateBalance()" placeholder="0" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-2 text-xs text-amber-300 font-bold focus:outline-none focus:border-amber-400">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-medium text-slate-300 mb-1">Jumlah Terbayar / Cash In (Rp) <span class="text-rose-400">*</span></label>
+                            <input type="number" id="formAmountReceived" min="0" oninput="calculateBalance()" placeholder="0" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-2 text-xs text-emerald-400 font-bold focus:outline-none focus:border-amber-400">
+                        </div>
+                    </div>
+                    <div class="flex items-center justify-between text-xs pt-1 border-t border-amber-500/20">
+                        <span class="text-slate-400">Sisa Tagihan / Piutang Klien:</span>
+                        <span id="calculatedRemaining" class="font-bold text-rose-400">Rp 0</span>
+                    </div>
+                </div>
+
+                <div id="incomeStatusServicesGroup" class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-xs font-medium text-slate-300 mb-1">Status Pembayaran Klien</label>
+                        <select id="formStatus" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-2 text-xs text-slate-100 focus:outline-none focus:border-amber-400">
+                            <option value="AUTO">Otomatis Terkalkulasi</option>
+                            <option value="Lunas">Lunas</option>
+                            <option value="DP">DP / Parsial</option>
+                            <option value="Pending">Pending / Belum Bayar</option>
+                        </select>
+                    </div>
+
+                    <div>
+                        <label class="block text-xs font-medium text-slate-300 mb-1">Detail Vendor Included / Service Package</label>
+                        <input type="text" id="formServices" placeholder="E.g. Decor, Catering 500pax, MUA, Photo" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-2 text-xs text-slate-100 focus:outline-none focus:border-amber-400">
+                    </div>
+                </div>
+
+                <div>
+                    <label class="block text-xs font-medium text-slate-300 mb-1">Catatan Tambahan / Rundown Note</label>
+                    <textarea id="formNotes" rows="2" placeholder="Catatan jam acara, kontak PIC venue, rincian biaya..." class="w-full bg-slate-900 border border-slate-700 rounded-xl p-3 text-xs text-slate-100 focus:outline-none focus:border-amber-400"></textarea>
+                </div>
+
+                <div class="flex items-center justify-end gap-3 pt-3 border-t border-slate-700/60">
+                    <button type="button" onclick="closeModal()" class="px-4 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-medium transition">
+                        Batal
+                    </button>
+                    <button type="submit" class="px-5 py-2 rounded-xl gold-gradient-btn text-slate-950 font-bold text-xs transition hover:scale-105 shadow-md">
+                        Simpan Record Project
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- MODAL 2: PROJECT RESUME MODAL (VERY DETAILED BREAKDOWN) -->
+    <div id="projectResumeModal" class="fixed inset-0 bg-slate-950/85 backdrop-blur-md z-50 hidden flex items-center justify-center p-4">
+        <div class="glass-card w-full max-w-2xl rounded-2xl shadow-2xl overflow-hidden border border-amber-500/40 transform transition-all max-h-[92vh] overflow-y-auto">
+            
+            <!-- Resume Header -->
+            <div class="bg-slate-900/95 px-6 py-4 border-b border-amber-500/30 flex items-center justify-between sticky top-0 z-10">
+                <div class="flex items-center gap-3">
+                    <div class="w-10 h-10 rounded-xl bg-white p-1 flex items-center justify-center border border-amber-300/60 shadow-md shrink-0">
+                        <img src="rma-logo-emblem.png" alt="RMA Project Logo" class="w-full h-full object-contain">
+                    </div>
+                    <div>
+                        <h3 class="serif-title text-lg font-bold text-amber-200">RESUME FINANCIAL PROJECT</h3>
+                        <p class="text-[10px] text-slate-400 uppercase tracking-widest">RMA Project Wedding & Event Organizer</p>
+                    </div>
+                </div>
+                <button onclick="closeResumeModal()" class="text-slate-400 hover:text-rose-400 transition no-print">
+                    <i class="fa-solid fa-xmark text-xl"></i>
+                </button>
+            </div>
+
+            <!-- Resume Content -->
+            <div class="p-6 space-y-5 text-slate-200">
+
+                <!-- Printable Letterhead Header (Only displayed during Print) -->
+                <div class="hidden print:flex items-center justify-between border-b-2 border-slate-200 pb-4 mb-4">
+                    <img src="rma-logo-full.png" alt="RMA Project" class="h-14 w-auto object-contain">
+                    <div class="text-right">
+                        <h2 class="text-lg font-bold text-slate-900 tracking-wide font-serif">RESUME FINANCIAL PROJECT</h2>
+                        <p class="text-xs text-slate-600 uppercase tracking-wider">Official Invoice & Settlement</p>
+                    </div>
+                </div>
+
+                <!-- Client & Event Header Card -->
+                <div class="p-4 rounded-xl bg-slate-900/90 border border-slate-700 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
+                    <div>
+                        <div class="flex items-center gap-2">
+                            <h2 id="resClientName" class="serif-title text-xl font-bold text-amber-100">Nama Klien</h2>
+                            <span id="resEventCategoryBadge"></span>
+                        </div>
+                        <p id="resVenueDate" class="text-xs text-slate-400 mt-1"><i class="fa-regular fa-calendar-check text-amber-400 mr-1"></i> -</p>
+                    </div>
+                    <div id="resStatusBadge" class="text-right"></div>
+                </div>
+
+                <!-- High-level Financial Stats Grid -->
+                <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                    <div class="p-3.5 rounded-xl bg-amber-500/10 border border-amber-500/20 text-center">
+                        <p class="text-[10px] uppercase font-semibold text-slate-400">Total Nilai Project</p>
+                        <p id="resTotalContract" class="text-base font-extrabold text-amber-300 mt-0.5">Rp 0</p>
+                    </div>
+                    <div class="p-3.5 rounded-xl bg-emerald-500/10 border border-emerald-500/20 text-center">
+                        <p class="text-[10px] uppercase font-semibold text-slate-400">Total Uang Diterima</p>
+                        <p id="resTotalReceived" class="text-base font-extrabold text-emerald-400 mt-0.5">Rp 0</p>
+                    </div>
+                    <div class="p-3.5 rounded-xl bg-rose-500/10 border border-rose-500/20 text-center">
+                        <p class="text-[10px] uppercase font-semibold text-slate-400">Sisa Tagihan / Piutang</p>
+                        <p id="resRemainingBalance" class="text-base font-extrabold text-rose-400 mt-0.5">Rp 0</p>
+                    </div>
+                </div>
+
+                <!-- Payment Progress Bar -->
+                <div class="space-y-1.5">
+                    <div class="flex justify-between text-xs font-semibold">
+                        <span class="text-slate-300">Progress Pelunasan Project</span>
+                        <span id="resProgressPercent" class="text-amber-300">0%</span>
+                    </div>
+                    <div class="w-full h-3 bg-slate-900 rounded-full overflow-hidden border border-slate-700">
+                        <div id="resProgressBar" class="h-full gold-gradient-btn transition-all duration-500" style="width: 0%"></div>
+                    </div>
+                </div>
+
+                <!-- Detailed Breakdown Sections -->
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs">
+                    <!-- Column 1: Client & Service Info -->
+                    <div class="p-4 rounded-xl bg-slate-900/60 border border-slate-800 space-y-2.5">
+                        <h4 class="font-bold text-amber-200 uppercase tracking-wider text-[11px] border-b border-slate-800 pb-1.5 flex items-center gap-1.5">
+                            <i class="fa-solid fa-address-card text-amber-400"></i> Informasi Kontak & Paket
+                        </h4>
+                        <div>
+                            <span class="text-slate-400 block text-[10px]">Nomor WhatsApp:</span>
+                            <span id="resPhone" class="font-semibold text-slate-200">-</span>
+                        </div>
+                        <div>
+                            <span class="text-slate-400 block text-[10px]">Layanan & Vendor Included:</span>
+                            <span id="resServices" class="font-medium text-slate-300">-</span>
+                        </div>
+                        <div>
+                            <span class="text-slate-400 block text-[10px]">Catatan / Detail Acara:</span>
+                            <span id="resNotes" class="italic text-slate-400">-</span>
+                        </div>
+                    </div>
+
+                    <!-- Column 2: Expense Allocation for this project -->
+                    <div class="p-4 rounded-xl bg-slate-900/60 border border-slate-800 space-y-2.5">
+                        <div class="flex items-center justify-between border-b border-slate-800 pb-1.5">
+                            <h4 class="font-bold text-rose-300 uppercase tracking-wider text-[11px] flex items-center gap-1.5">
+                                <i class="fa-solid fa-chart-pie text-rose-400"></i> Ringkasan Pengeluaran Terkait
+                            </h4>
+                            <button type="button" onclick="openModalForActiveProject()" class="text-[10px] font-bold text-rose-300 hover:text-white bg-rose-500/20 hover:bg-rose-500/40 border border-rose-500/40 px-2.5 py-0.5 rounded-lg transition flex items-center gap-1 no-print">
+                                <i class="fa-solid fa-plus"></i> + Biaya Vendor
+                            </button>
+                        </div>
+                        <div class="flex justify-between items-center text-xs">
+                            <span class="text-slate-400">Total Biaya Vendor:</span>
+                            <span id="resLinkedExpense" class="font-bold text-rose-400">Rp 0</span>
+                        </div>
+                        <div class="flex justify-between items-center text-xs">
+                            <span class="text-slate-400">Estimasi Laba Kontrak:</span>
+                            <span id="resContractProfit" class="font-bold text-amber-300">Rp 0</span>
+                        </div>
+                        <div class="flex justify-between items-center text-xs border-t border-slate-800 pt-1.5">
+                            <span class="text-slate-300 font-semibold">Realisasi Kas (Diterima - Biaya):</span>
+                            <span id="resEstimatedProfit" class="font-bold text-emerald-400">Rp 0</span>
+                        </div>
+                        <p class="text-[10px] text-slate-500 italic mt-0.5">*Estimasi laba dihitung dari Nilai Kontrak dikurangi Seluruh Biaya Vendor Project.</p>
+                    </div>
+                </div>
+
+                <!-- Section: Rincian Pengeluaran Vendor Project -->
+                <div class="p-4 rounded-xl bg-slate-900/70 border border-slate-800 space-y-3">
+                    <div class="flex items-center justify-between border-b border-slate-800 pb-2">
+                        <div class="flex items-center gap-2">
+                            <span class="w-6 h-6 rounded-lg bg-rose-500/20 text-rose-400 flex items-center justify-center text-xs font-bold">
+                                <i class="fa-solid fa-receipt"></i>
+                            </span>
+                            <div>
+                                <h4 class="font-bold text-slate-200 text-xs uppercase tracking-wider">Rincian Biaya Vendor Project</h4>
+                                <p class="text-[10px] text-slate-400">Daftar pembayaran vendor dan operasional untuk project ini</p>
+                            </div>
+                        </div>
+                        <button type="button" onclick="openModalForActiveProject()" class="text-xs font-bold text-rose-300 hover:text-white bg-rose-500/20 hover:bg-rose-500/40 border border-rose-500/40 px-3 py-1.5 rounded-xl transition flex items-center gap-1.5 no-print shadow-sm">
+                            <i class="fa-solid fa-plus-circle"></i> + Catat Biaya Vendor
+                        </button>
+                    </div>
+                    <div id="resExpensesList" class="space-y-2 max-h-56 overflow-y-auto pr-1">
+                        <!-- Populated dynamically via JS -->
+                    </div>
+                </div>
+
+                <!-- Action Buttons inside Resume Modal -->
+                <div class="flex flex-wrap items-center justify-between gap-3 pt-3 border-t border-slate-800 no-print">
+                    <div class="flex flex-wrap items-center gap-2">
+                        <button id="resWaShareBtn" onclick="" class="px-3.5 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs flex items-center gap-2 transition shadow-md">
+                            <i class="fa-brands fa-whatsapp text-sm"></i>
+                            <span>Kirim Resume WA</span>
+                        </button>
+                        <button type="button" onclick="openInvoiceCustomizer(activeResumeItem ? activeResumeItem.id : null)" class="px-3.5 py-2 rounded-xl gold-gradient-btn text-slate-950 font-bold text-xs flex items-center gap-2 transition shadow-md hover:scale-105">
+                            <i class="fa-solid fa-file-invoice-dollar"></i>
+                            <span>Buat Invoice Tagihan</span>
+                        </button>
+                    </div>
+
+                    <div class="flex items-center gap-2">
+                        <button onclick="window.print()" class="px-3 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-amber-300 border border-slate-700 text-xs font-semibold flex items-center gap-1.5 transition">
+                            <i class="fa-solid fa-print"></i>
+                            <span>Cetak Resume</span>
+                        </button>
+                        <button onclick="closeResumeModal()" class="px-4 py-2 rounded-xl bg-slate-800 text-slate-300 text-xs font-medium">
+                            Tutup
+                        </button>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL 3: DETAIL ACARA DARI TANGGAL KALENDER -->
+    <div id="dayDetailModal" class="fixed inset-0 bg-slate-950/80 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+        <div class="glass-card w-full max-w-lg rounded-2xl shadow-2xl overflow-hidden border border-amber-500/30">
+            <div class="bg-slate-900/90 px-6 py-4 border-b border-slate-700 flex items-center justify-between">
+                <div>
+                    <h3 id="dayDetailTitle" class="serif-title text-base font-bold text-amber-200">Jadwal Event</h3>
+                    <p id="dayDetailSubtitle" class="text-xs text-slate-400">Daftar acara pada tanggal terpilih</p>
+                </div>
+                <button onclick="closeDayDetailModal()" class="text-slate-400 hover:text-rose-400 transition">
+                    <i class="fa-solid fa-xmark text-lg"></i>
+                </button>
+            </div>
+            <div class="p-6 space-y-4">
+                <div id="dayDetailContent" class="space-y-3 max-h-60 overflow-y-auto pr-1">
+                    <!-- Event list populated via JS -->
+                </div>
+                <div class="flex flex-wrap items-center justify-between gap-2 pt-3 border-t border-slate-700/60">
+                    <div class="flex items-center gap-2">
+                        <button id="addEventForDateBtn" onclick="" class="px-3.5 py-2 rounded-xl gold-gradient-btn text-slate-950 font-bold text-xs flex items-center gap-1.5 transition hover:scale-105 shadow-md">
+                            <i class="fa-solid fa-plus-circle"></i>
+                            <span>+ Tambah Project</span>
+                        </button>
+                        <button id="addExpenseForDateBtn" class="px-3 py-2 rounded-xl bg-rose-500/20 hover:bg-rose-500/30 text-rose-300 border border-rose-500/40 font-semibold text-xs flex items-center gap-1.5 transition">
+                            <i class="fa-solid fa-receipt"></i>
+                            <span>+ Pengeluaran Vendor</span>
+                        </button>
+                    </div>
+                    <button onclick="closeDayDetailModal()" class="px-4 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-medium">
+                        Tutup
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL 4: KONFIRMASI RESET DATABASE -->
+    <div id="resetConfirmModal" class="fixed inset-0 bg-slate-950/85 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+        <div class="glass-card w-full max-w-md rounded-2xl shadow-2xl overflow-hidden border border-rose-500/40 p-6 space-y-4 text-center">
+            <div class="w-14 h-14 rounded-full bg-rose-500/20 text-rose-400 border border-rose-500/40 flex items-center justify-center mx-auto text-2xl shadow-lg">
+                <i class="fa-solid fa-triangle-exclamation"></i>
+            </div>
+            <div class="space-y-1">
+                <h3 class="serif-title text-lg font-bold text-rose-300">Kosongkan Seluruh Database?</h3>
+                <p class="text-xs text-slate-400">Tindakan ini akan menghapus <strong>seluruh data project dan transaksi</strong> secara permanen. Data tidak dapat dikembalikan.</p>
+            </div>
+            <div class="flex items-center justify-center gap-3 pt-2">
+                <button onclick="closeResetModal()" class="w-1/2 py-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-semibold transition">
+                    Batal
+                </button>
+                <button onclick="confirmResetDatabase()" class="w-1/2 py-2.5 rounded-xl bg-rose-600 hover:bg-rose-500 text-white text-xs font-bold transition shadow-lg">
+                    Ya, Hapus Semua
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL 5: CUSTOMISE & CETAK INVOICE TAGIHAN CUSTOMER -->
+    <div id="invoiceCustomizerModal" class="fixed inset-0 bg-slate-950/85 backdrop-blur-md z-50 hidden flex items-center justify-center p-2 sm:p-4 overflow-y-auto">
+        <div class="glass-card w-full max-w-6xl rounded-2xl shadow-2xl overflow-hidden border border-amber-500/30 my-auto flex flex-col max-h-[96vh]">
+            
+            <!-- Modal Header (No-Print) -->
+            <div id="invoiceModalHeader" class="bg-slate-900/95 px-5 py-3.5 border-b border-slate-700/80 flex items-center justify-between no-print shrink-0">
+                <div class="flex items-center gap-3">
+                    <div class="w-10 h-10 rounded-xl bg-amber-500/10 border border-amber-500/30 flex items-center justify-center text-amber-400">
+                        <i class="fa-solid fa-file-invoice-dollar text-lg"></i>
+                    </div>
+                    <div>
+                        <h3 class="serif-title text-base sm:text-lg font-bold text-amber-200">Customise & Cetak Invoice Tagihan</h3>
+                        <p id="invModalSubtitle" class="text-xs text-slate-400">Hanya menghitung Nilai Project dikurangi Uang Masuk • TTD Owner RMA Project</p>
+                    </div>
+                </div>
+                <div class="flex items-center gap-2">
+                    <button type="button" onclick="shareInvoiceWhatsApp()" class="px-3 py-1.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs flex items-center gap-1.5 transition shadow">
+                        <i class="fa-brands fa-whatsapp text-sm"></i>
+                        <span class="hidden sm:inline">Kirim WA</span>
+                    </button>
+                    <button type="button" onclick="printCustomerInvoice()" class="px-3.5 py-1.5 rounded-xl gold-gradient-btn text-slate-950 font-bold text-xs flex items-center gap-1.5 transition hover:scale-105 shadow-md">
+                        <i class="fa-solid fa-print"></i>
+                        <span>Cetak Invoice</span>
+                    </button>
+                    <button type="button" onclick="closeInvoiceCustomizer()" class="text-slate-400 hover:text-rose-400 transition p-1 ml-1" title="Tutup">
+                        <i class="fa-solid fa-xmark text-xl"></i>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Modal Body (Split Layout: Controls on Left, Live Sheet on Right) -->
+            <div class="flex-1 overflow-y-auto grid grid-cols-1 lg:grid-cols-12 bg-slate-950/70">
+                
+                <!-- KOLOM KIRI: FORM CONTROLS CUSTOMISE (No-Print) -->
+                <div id="invoiceCustomizerControls" class="lg:col-span-5 p-4 sm:p-5 border-r border-slate-800 space-y-4 overflow-y-auto max-h-[calc(96vh-75px)] text-xs no-print">
+                    
+                    <!-- Alert Petunjuk -->
+                    <div class="p-3 rounded-xl bg-amber-500/10 border border-amber-500/20 text-slate-300 space-y-1">
+                        <div class="flex items-center gap-2 text-amber-300 font-bold text-xs">
+                            <i class="fa-solid fa-sliders"></i>
+                            <span>Menu Kustomisasi Tagihan Customer</span>
+                        </div>
+                        <p class="text-[11px] text-slate-400">
+                            Sesuaikan rincian, jatuh tempo, rekening, dan tanda tangan owner di bawah. Lembar preview di kanan akan langsung terupdate secara real-time.
+                        </p>
+                    </div>
+
+                    <!-- Accordion Section 1: Nomor & Tanggal -->
+                    <div class="p-3.5 rounded-xl bg-slate-900/80 border border-slate-800 space-y-3">
+                        <h4 class="font-bold text-amber-200 text-xs uppercase tracking-wider flex items-center gap-1.5 border-b border-slate-800 pb-2">
+                            <i class="fa-solid fa-receipt text-amber-400"></i> No. Dokumen & Status
+                        </h4>
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+                            <div>
+                                <label class="block text-[10px] text-slate-400 mb-1">Nomor Invoice</label>
+                                <input type="text" id="invNumber" oninput="renderInvoicePreview()" class="w-full bg-slate-950 border border-slate-700 rounded-lg px-2.5 py-1.5 text-slate-200 font-mono text-xs focus:border-amber-400 focus:outline-none">
+                            </div>
+                            <div>
+                                <label class="block text-[10px] text-slate-400 mb-1">Status Tagihan</label>
+                                <select id="invStatus" onchange="renderInvoicePreview()" class="w-full bg-slate-950 border border-slate-700 rounded-lg px-2.5 py-1.5 text-slate-200 text-xs focus:border-amber-400 focus:outline-none">
+                                    <option value="BELUM LUNAS">BELUM LUNAS</option>
+                                    <option value="LUNAS">LUNAS</option>
+                                    <option value="TERMIN 1 - DP">TERMIN 1 - DP</option>
+                                    <option value="TERMIN 2 - PELUNASAN">TERMIN 2 - PELUNASAN</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="block text-[10px] text-slate-400 mb-1">Tanggal Terbit</label>
+                                <input type="date" id="invDate" onchange="renderInvoicePreview()" class="w-full bg-slate-950 border border-slate-700 rounded-lg px-2.5 py-1.5 text-slate-200 text-xs focus:border-amber-400 focus:outline-none">
+                            </div>
+                            <div>
+                                <label class="block text-[10px] text-slate-400 mb-1">Jatuh Tempo (Due Date)</label>
+                                <input type="date" id="invDueDate" onchange="renderInvoicePreview()" class="w-full bg-slate-950 border border-slate-700 rounded-lg px-2.5 py-1.5 text-slate-200 text-xs focus:border-amber-400 focus:outline-none">
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Accordion Section 2: Data Customer & Acara -->
+                    <div class="p-3.5 rounded-xl bg-slate-900/80 border border-slate-800 space-y-3">
+                        <h4 class="font-bold text-amber-200 text-xs uppercase tracking-wider flex items-center gap-1.5 border-b border-slate-800 pb-2">
+                            <i class="fa-solid fa-user text-amber-400"></i> Informasi Customer & Acara
+                        </h4>
+                        <div class="space-y-2">
+                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                                <div>
+                                    <label class="block text-[10px] text-slate-400 mb-1">Nama Customer / Pengantin</label>
+                                    <input type="text" id="invCustomerName" oninput="renderInvoicePreview()" class="w-full bg-slate-950 border border-slate-700 rounded-lg px-2.5 py-1.5 text-slate-200 text-xs focus:border-amber-400 focus:outline-none">
+                                </div>
+                                <div>
+                                    <label class="block text-[10px] text-slate-400 mb-1">No. WhatsApp</label>
+                                    <input type="text" id="invCustomerPhone" oninput="renderInvoicePreview()" class="w-full bg-slate-950 border border-slate-700 rounded-lg px-2.5 py-1.5 text-slate-200 text-xs focus:border-amber-400 focus:outline-none">
+                                </div>
+                            </div>
+                            <div>
+                                <label class="block text-[10px] text-slate-400 mb-1">Alamat / Kota Customer</label>
+                                <input type="text" id="invCustomerAddress" oninput="renderInvoicePreview()" placeholder="Contoh: Bandung, Jawa Barat" class="w-full bg-slate-950 border border-slate-700 rounded-lg px-2.5 py-1.5 text-slate-200 text-xs focus:border-amber-400 focus:outline-none">
+                            </div>
+                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                                <div>
+                                    <label class="block text-[10px] text-slate-400 mb-1">Kategori Acara</label>
+                                    <input type="text" id="invEventCategory" oninput="renderInvoicePreview()" class="w-full bg-slate-950 border border-slate-700 rounded-lg px-2.5 py-1.5 text-slate-200 text-xs focus:border-amber-400 focus:outline-none">
+                                </div>
+                                <div>
+                                    <label class="block text-[10px] text-slate-400 mb-1">Tanggal Acara</label>
+                                    <input type="date" id="invEventDate" onchange="renderInvoicePreview()" class="w-full bg-slate-950 border border-slate-700 rounded-lg px-2.5 py-1.5 text-slate-200 text-xs focus:border-amber-400 focus:outline-none">
+                                </div>
+                            </div>
+                            <div>
+                                <label class="block text-[10px] text-slate-400 mb-1">Venue / Lokasi Acara</label>
+                                <input type="text" id="invEventVenue" oninput="renderInvoicePreview()" class="w-full bg-slate-950 border border-slate-700 rounded-lg px-2.5 py-1.5 text-slate-200 text-xs focus:border-amber-400 focus:outline-none">
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Accordion Section 3: Rincian Paket & Uang Masuk -->
+                    <div class="p-3.5 rounded-xl bg-slate-900/80 border border-slate-800 space-y-3">
+                        <div class="flex items-center justify-between border-b border-slate-800 pb-2">
+                            <h4 class="font-bold text-amber-200 text-xs uppercase tracking-wider flex items-center gap-1.5">
+                                <i class="fa-solid fa-calculator text-amber-400"></i> Rincian Paket & Pembayaran
+                            </h4>
+                            <span class="text-[10px] text-amber-300 font-semibold">Nilai Project - Uang Masuk</span>
+                        </div>
+                        
+                        <div class="space-y-2.5">
+                            <div>
+                                <label class="block text-[10px] text-slate-400 mb-1">Uraian Paket Project</label>
+                                <input type="text" id="invItemDesc" oninput="renderInvoicePreview()" value="Paket Wedding Organizer & All-In Services" class="w-full bg-slate-950 border border-slate-700 rounded-lg px-2.5 py-1.5 text-slate-200 text-xs focus:border-amber-400 focus:outline-none">
+                            </div>
+                            <div>
+                                <label class="block text-[10px] text-slate-400 mb-1">Total Nilai Project / Kontrak (Rp)</label>
+                                <input type="number" id="invTotalProjectValue" oninput="renderInvoicePreview()" class="w-full bg-slate-950 border border-slate-700 rounded-lg px-2.5 py-1.5 text-amber-300 font-bold text-xs focus:border-amber-400 focus:outline-none">
+                            </div>
+
+                            <div class="border-t border-slate-800 pt-2">
+                                <label class="block text-[10px] text-slate-400 mb-1">Uraian Pembayaran Masuk (DP/Cicilan)</label>
+                                <input type="text" id="invReceivedDesc" oninput="renderInvoicePreview()" value="Pembayaran Telah Diterima (DP / Cicilan)" class="w-full bg-slate-950 border border-slate-700 rounded-lg px-2.5 py-1.5 text-slate-200 text-xs focus:border-amber-400 focus:outline-none">
+                            </div>
+                            <div>
+                                <label class="block text-[10px] text-slate-400 mb-1">Jumlah Uang Masuk yang Diterima (Rp)</label>
+                                <input type="number" id="invAmountReceived" oninput="renderInvoicePreview()" class="w-full bg-slate-950 border border-slate-700 rounded-lg px-2.5 py-1.5 text-emerald-400 font-bold text-xs focus:border-amber-400 focus:outline-none">
+                            </div>
+
+                            <!-- Dynamic Custom Additional Items (Optional) -->
+                            <div class="pt-2 border-t border-slate-800 space-y-2">
+                                <div class="flex items-center justify-between">
+                                    <span class="text-[10px] text-slate-400">Penyesuaian / Item Tambahan (Opsional)</span>
+                                    <button type="button" onclick="addCustomInvoiceItem()" class="text-[10px] text-amber-300 hover:text-white font-bold bg-amber-500/20 px-2 py-0.5 rounded transition">
+                                        + Tambah Baris
+                                    </button>
+                                </div>
+                                <div id="customInvoiceItemsContainer" class="space-y-1.5">
+                                    <!-- Populated dynamically via JS -->
+                                </div>
+                            </div>
+
+                            <!-- Live Calculation Summary Box -->
+                            <div class="p-2.5 rounded-xl bg-slate-950/80 border border-amber-500/30 space-y-1 mt-2">
+                                <div class="flex justify-between text-[11px] text-slate-400">
+                                    <span>Nilai Project:</span>
+                                    <span id="calcSummaryContract" class="font-bold text-amber-300">Rp 0</span>
+                                </div>
+                                <div class="flex justify-between text-[11px] text-slate-400">
+                                    <span>Uang Masuk:</span>
+                                    <span id="calcSummaryReceived" class="font-bold text-emerald-400">- Rp 0</span>
+                                </div>
+                                <div class="flex justify-between text-xs pt-1 border-t border-slate-800 text-slate-200 font-bold">
+                                    <span>Sisa Tagihan:</span>
+                                    <span id="calcSummaryRemaining" class="text-rose-400 text-sm">Rp 0</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Accordion Section 4: Rekening Bank RMA Project -->
+                    <div class="p-3.5 rounded-xl bg-slate-900/80 border border-slate-800 space-y-3">
+                        <h4 class="font-bold text-amber-200 text-xs uppercase tracking-wider flex items-center gap-1.5 border-b border-slate-800 pb-2">
+                            <i class="fa-solid fa-credit-card text-amber-400"></i> Rekening Pembayaran Resmi RMA Project
+                        </h4>
+                        <div class="space-y-2">
+                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                                <div>
+                                    <label class="block text-[10px] text-slate-400 mb-1">Nama Bank</label>
+                                    <input type="text" id="invBankName" oninput="renderInvoicePreview()" value="Bank BCA" class="w-full bg-slate-950 border border-slate-700 rounded-lg px-2.5 py-1.5 text-slate-200 text-xs focus:border-amber-400 focus:outline-none">
+                                </div>
+                                <div>
+                                    <label class="block text-[10px] text-slate-400 mb-1">Nomor Rekening</label>
+                                    <input type="text" id="invBankAccountNumber" oninput="renderInvoicePreview()" value="123-456-7890" class="w-full bg-slate-950 border border-slate-700 rounded-lg px-2.5 py-1.5 text-slate-200 font-mono text-xs focus:border-amber-400 focus:outline-none">
+                                </div>
+                            </div>
+                            <div>
+                                <label class="block text-[10px] text-slate-400 mb-1">Atas Nama Rekening</label>
+                                <input type="text" id="invBankAccountName" oninput="renderInvoicePreview()" value="RMA Project Wedding Organizer" class="w-full bg-slate-950 border border-slate-700 rounded-lg px-2.5 py-1.5 text-slate-200 text-xs focus:border-amber-400 focus:outline-none">
+                            </div>
+                            <div>
+                                <label class="block text-[10px] text-slate-400 mb-1">Catatan Tambahan Transfer</label>
+                                <input type="text" id="invBankNotes" oninput="renderInvoicePreview()" value="* Mohon cantumkan No. Invoice pada berita transfer" class="w-full bg-slate-950 border border-slate-700 rounded-lg px-2.5 py-1.5 text-slate-200 text-xs focus:border-amber-400 focus:outline-none">
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Accordion Section 5: Syarat & Ketentuan Pembayaran -->
+                    <div class="p-3.5 rounded-xl bg-slate-900/80 border border-slate-800 space-y-2">
+                        <h4 class="font-bold text-amber-200 text-xs uppercase tracking-wider flex items-center gap-1.5 border-b border-slate-800 pb-2">
+                            <i class="fa-solid fa-file-contract text-amber-400"></i> Syarat & Ketentuan Pembayaran
+                        </h4>
+                        <div>
+                            <textarea id="invTerms" oninput="renderInvoicePreview()" rows="3" class="w-full bg-slate-950 border border-slate-700 rounded-lg p-2 text-slate-300 text-xs focus:border-amber-400 focus:outline-none leading-relaxed"></textarea>
+                        </div>
+                    </div>
+
+                    <!-- Accordion Section 6: Tanda Tangan Owner RMA Project -->
+                    <div class="p-3.5 rounded-xl bg-slate-900/80 border border-slate-800 space-y-3">
+                        <div class="flex items-center justify-between border-b border-slate-800 pb-2">
+                            <h4 class="font-bold text-amber-200 text-xs uppercase tracking-wider flex items-center gap-1.5">
+                                <i class="fa-solid fa-signature text-amber-400"></i> Tanda Tangan Owner RMA Project
+                            </h4>
+                            <span class="text-[10px] text-amber-300 font-semibold">Pengesahan Resmi</span>
+                        </div>
+                        
+                        <div class="space-y-2.5">
+                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                                <div>
+                                    <label class="block text-[10px] text-slate-400 mb-1">Kota Penerbitan</label>
+                                    <input type="text" id="invSignCity" oninput="renderInvoicePreview()" value="Bandung" class="w-full bg-slate-950 border border-slate-700 rounded-lg px-2.5 py-1.5 text-slate-200 text-xs focus:border-amber-400 focus:outline-none">
+                                </div>
+                                <div>
+                                    <label class="block text-[10px] text-slate-400 mb-1">Tanggal TTD</label>
+                                    <input type="text" id="invSignDate" oninput="renderInvoicePreview()" class="w-full bg-slate-950 border border-slate-700 rounded-lg px-2.5 py-1.5 text-slate-200 text-xs focus:border-amber-400 focus:outline-none">
+                                </div>
+                            </div>
+                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                                <div>
+                                    <label class="block text-[10px] text-slate-400 mb-1">Nama Owner RMA Project</label>
+                                    <input type="text" id="invOwnerName" oninput="renderInvoicePreview()" value="Owner RMA Project" class="w-full bg-slate-950 border border-slate-700 rounded-lg px-2.5 py-1.5 text-slate-200 text-xs focus:border-amber-400 focus:outline-none">
+                                </div>
+                                <div>
+                                    <label class="block text-[10px] text-slate-400 mb-1">Jabatan Penandatangan</label>
+                                    <input type="text" id="invOwnerTitle" oninput="renderInvoicePreview()" value="Owner & Founder RMA Project" class="w-full bg-slate-950 border border-slate-700 rounded-lg px-2.5 py-1.5 text-slate-200 text-xs focus:border-amber-400 focus:outline-none">
+                                </div>
+                            </div>
+
+                            <!-- Interactive Signature Pad (Canvas) -->
+                            <div class="space-y-1.5 pt-1">
+                                <div class="flex items-center justify-between">
+                                    <label class="text-[10px] text-slate-400 font-semibold">Tanda Tangan Digital Owner (Coretan Langsung):</label>
+                                    <button type="button" onclick="clearSignatureCanvas()" class="text-[10px] text-rose-400 hover:text-white font-bold inline-flex items-center gap-1 transition">
+                                        <i class="fa-solid fa-eraser"></i> Bersihkan TTD
+                                    </button>
+                                </div>
+                                <div class="border border-slate-700 rounded-xl overflow-hidden bg-white p-1">
+                                    <canvas id="invSignatureCanvas" width="320" height="90" class="w-full h-20 bg-white rounded-lg touch-none cursor-crosshair block"></canvas>
+                                </div>
+                                <p class="text-[9px] text-slate-500 italic">Gunakan mouse, trackpad, atau sentuhan layar untuk menandatangani.</p>
+                            </div>
+
+                            <!-- Checkboxes for Stamp & Manual Mode -->
+                            <div class="pt-2 border-t border-slate-800 space-y-1.5">
+                                <label class="flex items-center gap-2 cursor-pointer select-none text-slate-300">
+                                    <input type="checkbox" id="invIncludeStamp" onchange="renderInvoicePreview()" checked class="rounded border-slate-700 text-amber-500 focus:ring-amber-400">
+                                    <span>Sertakan Stempel Resmi Digital RMA Project (Official Seal)</span>
+                                </label>
+                                <label class="flex items-center gap-2 cursor-pointer select-none text-slate-300">
+                                    <input type="checkbox" id="invManualSign" onchange="renderInvoicePreview()" class="rounded border-slate-700 text-amber-500 focus:ring-amber-400">
+                                    <span>Mode Tanda Tangan Basah Manual (Sediakan garis kosong untuk pena)</span>
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+
+                <!-- KOLOM KANAN: LIVE PREVIEW & PRINTABLE INVOICE SHEET -->
+                <div id="invoicePreviewScrollWrapper" class="lg:col-span-7 p-4 sm:p-6 overflow-y-auto max-h-[calc(96vh-75px)] flex flex-col items-center justify-start bg-slate-900/40">
+                    
+                    <!-- Floating Preview Info & Quick Action (No-Print) -->
+                    <div class="w-full max-w-[210mm] flex items-center justify-between pb-3 text-xs text-slate-400 no-print">
+                        <span class="flex items-center gap-1.5 text-amber-300 font-semibold">
+                            <i class="fa-solid fa-eye"></i>
+                            <span>Live Preview Invoice Format A4</span>
+                        </span>
+                        <div class="flex items-center gap-2">
+                            <button type="button" onclick="shareInvoiceWhatsApp()" class="px-3 py-1.5 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white font-bold flex items-center gap-1.5 transition shadow">
+                                <i class="fa-brands fa-whatsapp text-sm"></i> Kirim WA
+                            </button>
+                            <button type="button" onclick="printCustomerInvoice()" class="px-3.5 py-1.5 rounded-lg gold-gradient-btn text-slate-950 font-bold flex items-center gap-1.5 transition shadow hover:scale-105">
+                                <i class="fa-solid fa-print"></i> Cetak / Simpan PDF
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- THE LUXURY A4 INVOICE SHEET -->
+                    <div id="printableInvoiceDoc" class="w-full max-w-[210mm] bg-white text-slate-800 rounded-xl shadow-2xl p-6 sm:p-8 border border-slate-200 space-y-5 print:shadow-none print:border-none print:p-0 print:m-0 print:max-w-full">
+                        
+                        <!-- Header with RMA Logo and Invoice Title -->
+                        <div class="flex items-start justify-between border-b-2 border-amber-500/30 pb-4">
+                            <div class="space-y-1">
+                                <img src="rma-logo-full.png" alt="RMA Project" class="h-12 w-auto object-contain">
+                                <p class="text-[11px] font-bold tracking-wider text-slate-900 uppercase">RMA Project Wedding Organizer</p>
+                                <p class="text-[10px] text-slate-500">Luxury Wedding & Event Planner Specialist</p>
+                                <p class="text-[10px] text-slate-500"><i class="fa-brands fa-whatsapp text-emerald-600 mr-1"></i>WA: <strong id="prevVendorWA" class="text-slate-700">0811-1939-870</strong> &nbsp;<span class="text-slate-300">|</span>&nbsp; <i class="fa-brands fa-instagram text-rose-500 mr-0.5"></i>@rma.project</p>
+                                <p class="text-[10px] text-slate-500"><i class="fa-solid fa-globe text-amber-600 mr-1"></i><a href="https://rmaproject.id" target="_blank" class="font-semibold text-amber-700 hover:underline">rmaproject.id</a></p>
+                            </div>
+                            <div class="text-right space-y-1">
+                                <h2 class="serif-title text-xl sm:text-2xl font-extrabold text-slate-900 tracking-wide uppercase">INVOICE TAGIHAN</h2>
+                                <div class="inline-block">
+                                    <span id="prevInvStatus" class="px-2.5 py-0.5 rounded text-[10px] font-bold uppercase bg-rose-100 text-rose-700 border border-rose-300">
+                                        BELUM LUNAS
+                                    </span>
+                                </div>
+                                <div class="text-xs text-slate-600 space-y-0.5 pt-1">
+                                    <p>No. Invoice: <strong id="prevInvNumber" class="text-slate-900 font-mono">INV/RMA/2026/10/001</strong></p>
+                                    <p>Tanggal: <span id="prevInvDate">18 Oktober 2026</span></p>
+                                    <p>Jatuh Tempo: <strong id="prevInvDueDate" class="text-rose-600">25 Oktober 2026</strong></p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Gold Accent Line -->
+                        <div class="h-1 w-full bg-gradient-to-r from-amber-400 via-yellow-500 to-amber-600 rounded-full"></div>
+
+                        <!-- Client & Event Info Boxes -->
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 text-xs">
+                            <div class="p-3.5 rounded-xl bg-slate-50 border border-slate-200 space-y-1">
+                                <p class="text-[10px] font-bold text-amber-700 uppercase tracking-wider flex items-center gap-1.5">
+                                    <i class="fa-solid fa-user-check text-amber-600"></i> Tagihan Ditujukan Kepada (Customer):
+                                </p>
+                                <p id="prevCustomerName" class="text-sm font-bold text-slate-900">riza adi</p>
+                                <p id="prevCustomerPhone" class="text-slate-600"><i class="fa-solid fa-phone text-slate-400 mr-1"></i>-</p>
+                                <p id="prevCustomerAddress" class="text-slate-500 text-[11px]"><i class="fa-solid fa-location-dot text-slate-400 mr-1"></i>-</p>
+                            </div>
+                            <div class="p-3.5 rounded-xl bg-slate-50 border border-slate-200 space-y-1">
+                                <p class="text-[10px] font-bold text-amber-700 uppercase tracking-wider flex items-center gap-1.5">
+                                    <i class="fa-solid fa-calendar-check text-amber-600"></i> Detail Agenda Acara:
+                                </p>
+                                <p id="prevEventCategory" class="text-sm font-bold text-slate-900">Wedding / Pernikahan</p>
+                                <p class="text-slate-600"><i class="fa-regular fa-calendar text-slate-400 mr-1"></i>Tanggal Acara: <strong id="prevEventDate" class="text-slate-800">-</strong></p>
+                                <p class="text-slate-500 text-[11px]"><i class="fa-solid fa-building text-slate-400 mr-1"></i>Venue: <span id="prevEventVenue">-</span></p>
+                            </div>
+                        </div>
+
+                        <!-- Calculation Table: ONLY Nilai Project dikurangi Uang Masuk -->
+                        <div class="border border-slate-200 rounded-xl overflow-hidden">
+                            <table class="w-full text-left text-xs">
+                                <thead class="bg-slate-100 text-slate-700 font-bold border-b border-slate-200">
+                                    <tr>
+                                        <th class="py-2.5 px-3 w-10 text-center">No</th>
+                                        <th class="py-2.5 px-3">Uraian / Deskripsi Tagihan</th>
+                                        <th class="py-2.5 px-3 text-right">Nominal (Rp)</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="prevInvoiceItemsTbody" class="divide-y divide-slate-100 text-slate-700">
+                                    <!-- Populated dynamically via JS -->
+                                </tbody>
+                                <tfoot class="bg-slate-50 border-t-2 border-slate-200 font-semibold">
+                                    <tr>
+                                        <td colspan="2" class="py-2 px-3 text-right text-slate-600">Total Nilai Kontrak Project:</td>
+                                        <td id="prevSubtotalContract" class="py-2 px-3 text-right font-bold text-slate-900">Rp 0</td>
+                                    </tr>
+                                    <tr class="text-emerald-700 bg-emerald-50/60">
+                                        <td colspan="2" class="py-2 px-3 text-right">Pembayaran Telah Diterima (DP / Cicilan):</td>
+                                        <td id="prevTotalPaid" class="py-2 px-3 text-right font-bold text-emerald-700">- Rp 0</td>
+                                    </tr>
+                                    <!-- Optional additional fees rows if any -->
+                                    <tr id="prevAdditionalRow" class="hidden text-slate-700">
+                                        <td colspan="2" class="py-2 px-3 text-right">Penyesuaian / Biaya Tambahan:</td>
+                                        <td id="prevAdditionalTotal" class="py-2 px-3 text-right font-bold text-slate-900">Rp 0</td>
+                                    </tr>
+                                    <tr class="bg-amber-500/10 border-t-2 border-amber-500 text-slate-900">
+                                        <td colspan="2" class="py-3 px-3 text-right text-sm font-extrabold text-amber-900 uppercase">
+                                            Sisa Tagihan yang Harus Dibayar:
+                                        </td>
+                                        <td id="prevRemainingDue" class="py-3 px-3 text-right text-base font-extrabold text-amber-900">
+                                            Rp 0
+                                        </td>
+                                    </tr>
+                                </tfoot>
+                            </table>
+                        </div>
+
+                        <!-- Terbilang Box -->
+                        <div class="p-3 rounded-xl bg-amber-50 border border-amber-200/70 text-xs">
+                            <p class="text-[10px] font-bold uppercase text-amber-800 tracking-wider">Terbilang:</p>
+                            <p id="prevTerbilang" class="font-serif italic font-semibold text-slate-800 mt-0.5">Nol Rupiah</p>
+                        </div>
+
+                        <!-- Bottom Section: Payment Info & Owner Signature -->
+                        <div class="grid grid-cols-1 sm:grid-cols-12 gap-5 pt-2 text-xs">
+                            
+                            <!-- Left: Bank Account & Terms -->
+                            <div class="sm:col-span-7 space-y-3">
+                                <div class="p-3 rounded-xl bg-slate-50 border border-slate-200 space-y-1.5">
+                                    <p class="font-bold text-slate-800 text-[11px] uppercase tracking-wider flex items-center gap-1.5">
+                                        <i class="fa-solid fa-credit-card text-amber-600"></i> Rekening Pembayaran Resmi:
+                                    </p>
+                                    <div class="text-xs space-y-0.5 text-slate-700">
+                                        <p>Bank: <strong id="prevBankName" class="text-slate-900">Bank BCA</strong></p>
+                                        <p>No. Rekening: <strong id="prevBankAccountNumber" class="text-slate-900 font-mono tracking-wider">123-456-7890</strong></p>
+                                        <p>Atas Nama: <strong id="prevBankAccountName" class="text-slate-900">RMA Project Wedding Organizer</strong></p>
+                                        <p id="prevBankNotes" class="text-[10px] text-slate-500 italic mt-1">* Mohon cantumkan No. Invoice saat transfer</p>
+                                    </div>
+                                </div>
+
+                                <div class="space-y-1 text-slate-600 text-[11px]">
+                                    <p class="font-bold text-slate-700 uppercase tracking-wider text-[10px]">Syarat & Ketentuan Pembayaran:</p>
+                                    <div id="prevTermsList" class="space-y-0.5 text-[10px] text-slate-500 whitespace-pre-line leading-relaxed"></div>
+                                </div>
+                            </div>
+
+                            <!-- Right: Official RMA Signature & Stamp -->
+                            <div class="sm:col-span-5 flex flex-col items-center justify-between text-center pt-1">
+                                <div class="space-y-0.5">
+                                    <p id="prevSignCityDate" class="text-slate-600 text-[11px]">Bandung, 18 Oktober 2026</p>
+                                    <p class="text-[10px] uppercase font-bold text-slate-500">Hormat Kami,</p>
+                                    <p class="text-xs font-bold text-slate-800 font-serif">RMA Project Wedding Organizer</p>
+                                </div>
+
+                                <!-- Signature & Stamp Container -->
+                                <div class="relative w-48 h-24 my-1 flex items-center justify-center">
+                                    <!-- Digital Stamp (Overlayed) -->
+                                    <div id="prevStampWrapper" class="absolute left-1 top-0 z-10 select-none pointer-events-none">
+                                        <div class="w-20 h-20 rounded-full border-2 border-rose-800/80 p-0.5 flex items-center justify-center text-center rotate-[-12deg] opacity-85">
+                                            <div class="w-full h-full rounded-full border border-dashed border-rose-800 flex flex-col items-center justify-center p-0.5">
+                                                <span class="text-[6.5px] font-extrabold uppercase tracking-widest text-rose-900">RMA PROJECT</span>
+                                                <div class="w-5 h-[1px] bg-rose-800 my-0.5"></div>
+                                                <span class="text-[5.5px] font-bold text-rose-800">OFFICIAL SEAL</span>
+                                                <span class="text-[6.5px] font-extrabold text-rose-900 mt-0.5">VERIFIED</span>
+                                                <span class="text-[5px] text-rose-700 tracking-tighter">WEDDING ORGANIZER</span>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <!-- Signature Image / Canvas Preview -->
+                                    <img id="previewSignatureImg" src="" alt="Tanda Tangan Owner" class="max-h-20 max-w-full object-contain relative z-20 hidden">
+                                    <div id="prevManualSignLine" class="hidden w-36 border-b border-dashed border-slate-400 mt-14"></div>
+                                </div>
+
+                                <!-- Owner Name & Title -->
+                                <div class="border-t border-slate-400 w-44 pt-1 space-y-0.5">
+                                    <p id="prevOwnerName" class="text-xs font-bold text-slate-900 uppercase">Owner RMA Project</p>
+                                    <p id="prevOwnerTitle" class="text-[10px] text-slate-500 italic">Owner & Founder RMA Project</p>
+                                </div>
+                            </div>
+
+                        </div>
+
+                        <div class="border-t border-slate-200 pt-2 text-center text-[9px] text-slate-400">
+                            Dokumen ini diterbitkan secara resmi oleh <strong class="text-slate-600">RMA Project Wedding Organizer</strong> sebagai bukti tagihan sah kepada customer.
+                            &nbsp;|&nbsp; WA: 0811-1939-870 &nbsp;|&nbsp; IG: @rma.project &nbsp;|&nbsp; rmaproject.id
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+
+        </div>
+    </div>
+
+    <!-- TOAST NOTIFICATION -->
+    <div id="toast" class="fixed bottom-5 right-5 z-50 transform translate-y-20 opacity-0 transition-all duration-300 bg-slate-800 border border-amber-500/40 text-slate-100 px-4 py-3 rounded-xl shadow-2xl flex items-center gap-3 text-xs">
+        <div id="toastIcon" class="text-amber-400 text-base">
+            <i class="fa-solid fa-circle-check"></i>
+        </div>
+        <span id="toastMessage">Transaksi berhasil disimpan!</span>
+    </div>
+
+    <!-- JAVASCRIPT APP LOGIC -->
+    <script>
+        const STORAGE_KEY = 'RMA_PROJECT_FINANCE_DATA_V4';
+        const AUTH_KEY = 'RMA_PROJECT_AUTH_SESSION_V4';
+
+        let transactions = [];
+        let currentCalendarDate = new Date();
+        let financialChartInstance = null;
+        let categoryChartInstance = null;
+        let activeResumeItem = null;
+
+        window.addEventListener('DOMContentLoaded', () => {
+            checkAuthSession();
+        });
+
+        function checkAuthSession() {
+            const session = localStorage.getItem(AUTH_KEY) || sessionStorage.getItem(AUTH_KEY);
+            if (session === 'true') {
+                showApp();
+            } else {
+                showLogin();
+            }
+        }
+
+        function handleLogin(e) {
+            e.preventDefault();
+            const usernameInput = document.getElementById('loginUsername').value.trim().toLowerCase();
+            const passwordInput = document.getElementById('loginPassword').value;
+            const rememberMe = document.getElementById('rememberMe').checked;
+
+            if (usernameInput === 'rmaproject' && passwordInput === 'rmaproject') {
+                if (rememberMe) {
+                    localStorage.setItem(AUTH_KEY, 'true');
+                } else {
+                    sessionStorage.setItem(AUTH_KEY, 'true');
+                }
+                showToast('Login Berhasil! Selamat Datang Kembali.');
+                showApp();
+            } else {
+                showToast('Username atau Password salah!', 'error');
+            }
+        }
+
+        function handleLogout() {
+            localStorage.removeItem(AUTH_KEY);
+            sessionStorage.removeItem(AUTH_KEY);
+            showToast('Anda telah logout dari system.', 'info');
+            showLogin();
+        }
+
+        function showLogin() {
+            document.getElementById('loginScreen').classList.remove('hidden');
+            document.getElementById('mainApp').classList.add('hidden');
+        }
+
+        function showApp() {
+            document.getElementById('loginScreen').classList.add('hidden');
+            document.getElementById('mainApp').classList.remove('hidden');
+
+            loadTransactions();
+            setDefaultDate();
+            renderDashboard();
+            renderCalendar();
+            renderUpcomingEvents();
+            renderTable();
+            initCharts();
+        }
+
+        function setDefaultDate() {
+            const today = new Date().toISOString().split('T')[0];
+            document.getElementById('formDate').value = today;
+        }
+
+        function loadTransactions() {
+            const stored = localStorage.getItem(STORAGE_KEY);
+            if (stored) {
+                try {
+                    transactions = JSON.parse(stored);
+                } catch (e) {
+                    transactions = [];
+                }
+            } else {
+                transactions = [];
+                saveTransactions();
+            }
+        }
+
+        function saveTransactions() {
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(transactions));
+        }
+
+        function openResetModal() {
+            document.getElementById('resetConfirmModal').classList.remove('hidden');
+        }
+
+        function closeResetModal() {
+            document.getElementById('resetConfirmModal').classList.add('hidden');
+        }
+
+        function confirmResetDatabase() {
+            transactions = [];
+            saveTransactions();
+            renderDashboard();
+            renderCalendar();
+            renderUpcomingEvents();
+            renderTable();
+            updateCharts();
+            closeResetModal();
+            showToast('Seluruh database telah dikosongkan!', 'info');
+        }
+
+        function formatRupiah(number) {
+            return new Intl.NumberFormat('id-ID', {
+                style: 'currency',
+                currency: 'IDR',
+                maximumFractionDigits: 0
+            }).format(number || 0);
+        }
+
+        function getEventCategoryBadge(eventCategory) {
+            const cat = eventCategory || 'Wedding / Pernikahan';
+            if (cat.includes('Wedding')) {
+                return `<span class="px-2 py-0.5 rounded text-[10px] font-semibold bg-rose-500/20 text-rose-300 border border-rose-500/30"><i class="fa-solid fa-heart mr-1"></i>Wedding</span>`;
+            } else if (cat.includes('Engagement') || cat.includes('Tunangan')) {
+                return `<span class="px-2 py-0.5 rounded text-[10px] font-semibold bg-amber-500/20 text-amber-300 border border-amber-500/30"><i class="fa-solid fa-ring mr-1"></i>Tunangan</span>`;
+            } else {
+                return `<span class="px-2 py-0.5 rounded text-[10px] font-semibold bg-sky-500/20 text-sky-300 border border-sky-500/30"><i class="fa-solid fa-star mr-1"></i>Event Lain</span>`;
+            }
+        }
+
+        // Render Dashboard Stats Cards
+        function renderDashboard() {
+            // Calculate Total Contract Omset
+            const totalContractValue = transactions
+                .filter(t => t.type === 'PEMASUKAN')
+                .reduce((sum, t) => sum + Number(t.totalProjectValue || t.amount || 0), 0);
+
+            // Actual Cash In (Amount Received)
+            const totalIncome = transactions
+                .filter(t => t.type === 'PEMASUKAN')
+                .reduce((sum, t) => sum + Number(t.amountReceived || t.amount || 0), 0);
+
+            // Total Expenses
+            const totalExpense = transactions
+                .filter(t => t.type === 'PENGELUARAN')
+                .reduce((sum, t) => sum + Number(t.amount || 0), 0);
+
+            // Total Client Outstanding (Piutang)
+            const pendingAmount = transactions
+                .filter(t => t.type === 'PEMASUKAN')
+                .reduce((sum, t) => sum + Number(t.remainingBalance || 0), 0);
+
+            // Realistic Cash Net Profit (Cash In Received - Expenses)
+            const netProfit = totalIncome - totalExpense;
+
+            document.getElementById('totalContractValue').innerText = formatRupiah(totalContractValue);
+            document.getElementById('totalIncome').innerText = formatRupiah(totalIncome);
+            document.getElementById('totalExpense').innerText = formatRupiah(totalExpense);
+            document.getElementById('pendingAmount').innerText = formatRupiah(pendingAmount);
+            document.getElementById('netProfit').innerText = formatRupiah(netProfit);
+
+            const badge = document.getElementById('profitStatusBadge');
+            if (netProfit >= 0) {
+                badge.innerText = 'Surplus Cash';
+                badge.className = 'px-1.5 py-0.5 rounded text-[9px] font-semibold bg-emerald-500/20 text-emerald-300 border border-emerald-500/30';
+            } else {
+                badge.innerText = 'Defisit Cash';
+                badge.className = 'px-1.5 py-0.5 rounded text-[9px] font-semibold bg-rose-500/20 text-rose-300 border border-rose-500/30';
+            }
+        }
+
+        // CALENDAR LOGIC
+        function changeMonth(delta) {
+            currentCalendarDate.setMonth(currentCalendarDate.getMonth() + delta);
+            renderCalendar();
+        }
+
+        function resetToCurrentMonth() {
+            currentCalendarDate = new Date();
+            renderCalendar();
+        }
+
+        function renderCalendar() {
+            const year = currentCalendarDate.getFullYear();
+            const month = currentCalendarDate.getMonth();
+
+            const monthNames = [
+                "Januari", "Februari", "Maret", "April", "Mei", "Juni",
+                "Juli", "Agustus", "September", "Oktober", "November", "Desember"
+            ];
+
+            document.getElementById('calendarMonthYear').innerText = `${monthNames[month]} ${year}`;
+
+            const calendarGrid = document.getElementById('calendarGrid');
+            calendarGrid.innerHTML = '';
+
+            const firstDayIndex = new Date(year, month, 1).getDay();
+            const totalDaysInMonth = new Date(year, month + 1, 0).getDate();
+            const prevMonthLastDay = new Date(year, month, 0).getDate();
+
+            for (let i = firstDayIndex; i > 0; i--) {
+                const prevDay = prevMonthLastDay - i + 1;
+                const cell = document.createElement('div');
+                cell.className = 'p-1 min-h-[48px] bg-slate-900/30 rounded-xl text-slate-600 text-[10px] pointer-events-none border border-transparent';
+                cell.innerText = prevDay;
+                calendarGrid.appendChild(cell);
+            }
+
+            const todayStr = new Date().toISOString().split('T')[0];
+
+            for (let day = 1; day <= totalDaysInMonth; day++) {
+                const dayString = `${year}-${String(month + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+                const dayEvents = transactions.filter(t => t.date === dayString);
+
+                const cell = document.createElement('div');
+                const isToday = dayString === todayStr;
+
+                cell.className = `p-1.5 min-h-[50px] rounded-xl border flex flex-col justify-between cursor-pointer transition relative ${
+                    isToday ? 'bg-amber-500/10 border-amber-400/80 shadow-md' : 'bg-slate-900/80 border-slate-800 hover:border-amber-500/40 hover:bg-slate-800/80'
+                }`;
+
+                cell.onclick = () => openDayDetailModal(dayString, dayEvents);
+
+                let dateBadge = `<span class="font-bold ${isToday ? 'text-amber-300 font-extrabold' : 'text-slate-300'} text-[11px]">${day}</span>`;
+                
+                let eventBadgeHtml = '';
+                if (dayEvents.length > 0) {
+                    const primaryEvent = dayEvents.find(t => t.type === 'PEMASUKAN') || dayEvents[0];
+                    const cat = primaryEvent.eventCategory || 'Wedding / Pernikahan';
+                    
+                    let catBg = 'bg-rose-500 text-slate-950';
+                    if (cat.includes('Engagement') || cat.includes('Tunangan')) catBg = 'bg-amber-500 text-slate-950';
+                    if (cat.includes('Lainnya')) catBg = 'bg-sky-500 text-slate-950';
+
+                    eventBadgeHtml = `
+                        <div class="mt-1 flex flex-col gap-0.5">
+                            <span class="px-1 py-0.5 rounded text-[8px] font-extrabold truncate ${catBg}">
+                                ${primaryEvent.client.split(' ')[0]}
+                            </span>
+                        </div>
+                    `;
+                }
+
+                cell.innerHTML = `
+                    <div class="flex items-center justify-between">
+                        ${dateBadge}
+                        ${dayEvents.length > 0 ? `<span class="w-1.5 h-1.5 rounded-full bg-amber-400"></span>` : ''}
+                    </div>
+                    ${eventBadgeHtml}
+                `;
+
+                calendarGrid.appendChild(cell);
+            }
+        }
+
+        // UPCOMING PROJECTS PANEL
+        function renderUpcomingEvents() {
+            const container = document.getElementById('upcomingEventsList');
+            container.innerHTML = '';
+
+            const incomeEvents = transactions
+                .filter(t => t.type === 'PEMASUKAN')
+                .sort((a, b) => new Date(a.date) - new Date(b.date));
+
+            if (incomeEvents.length === 0) {
+                container.innerHTML = `<p class="text-xs text-slate-500 italic py-6 text-center">Belum ada project tersimpan.</p>`;
+                return;
+            }
+
+            incomeEvents.slice(0, 5).forEach(event => {
+                let badgeBg = 'bg-amber-500/20 text-amber-300 border-amber-500/30';
+                if (event.status === 'Lunas') badgeBg = 'bg-emerald-500/20 text-emerald-300 border-emerald-500/30';
+                if (event.status === 'Pending') badgeBg = 'bg-rose-500/20 text-rose-300 border-rose-500/30';
+
+                const card = document.createElement('div');
+                card.className = 'p-3 rounded-xl bg-slate-900/90 border border-slate-800 hover:border-amber-500/30 transition space-y-2 cursor-pointer';
+                card.onclick = () => openProjectResumeModal(event.id);
+
+                card.innerHTML = `
+                    <div class="flex items-center justify-between gap-1">
+                        <span class="text-xs font-bold text-amber-100 truncate">${escapeHtml(event.client)}</span>
+                        ${getEventCategoryBadge(event.eventCategory)}
+                    </div>
+                    <div class="flex items-center justify-between text-[11px] text-slate-400">
+                        <span class="flex items-center gap-1"><i class="fa-regular fa-calendar text-amber-400"></i> ${event.date}</span>
+                        <div class="flex items-center gap-1.5">
+                            <span class="px-1.5 py-0.5 rounded text-[9px] font-semibold border ${badgeBg}">${event.status}</span>
+                            <span class="font-bold text-amber-300">${formatRupiah(event.totalProjectValue || event.amount)}</span>
+                        </div>
+                    </div>
+                `;
+                container.appendChild(card);
+            });
+        }
+
+        // HELPER: GET EXPENSES FOR A PROJECT
+        function getProjectExpenses(project) {
+            if (!project) return [];
+            return transactions.filter(t => 
+                t.type === 'PENGELUARAN' && (
+                    (t.projectId && t.projectId === project.id) ||
+                    (!t.projectId && t.client && project.client && t.client.toLowerCase() === project.client.toLowerCase())
+                )
+            );
+        }
+
+        // POPULATE PROJECT OPTIONS IN EXPENSE FORM
+        function populateExpenseProjectOptions(selectedProjectId = null) {
+            const select = document.getElementById('formExpenseProjectSelect');
+            if (!select) return;
+
+            const projects = transactions.filter(t => t.type === 'PEMASUKAN');
+            select.innerHTML = '';
+
+            if (projects.length === 0) {
+                select.innerHTML = '<option value="NON_PROJECT">-- Pengeluaran Umum / Operasional Non-Project --</option>';
+                return;
+            }
+
+            const defaultOpt = document.createElement('option');
+            defaultOpt.value = '';
+            defaultOpt.innerText = '-- Pilih Project Terkait --';
+            select.appendChild(defaultOpt);
+
+            projects.forEach(p => {
+                const opt = document.createElement('option');
+                opt.value = p.id;
+                opt.innerText = `${p.client} (${p.eventCategory ? p.eventCategory.split('/')[0].trim() : 'Wedding'} - ${p.date})`;
+                if (selectedProjectId && p.id === selectedProjectId) {
+                    opt.selected = true;
+                }
+                select.appendChild(opt);
+            });
+
+            const nonProjectOpt = document.createElement('option');
+            nonProjectOpt.value = 'NON_PROJECT';
+            nonProjectOpt.innerText = '-- Pengeluaran Umum / Operasional (Tanpa Project) --';
+            if (selectedProjectId === 'NON_PROJECT') nonProjectOpt.selected = true;
+            select.appendChild(nonProjectOpt);
+        }
+
+        function handleExpenseProjectSelectChange() {
+            const select = document.getElementById('formExpenseProjectSelect');
+            const projId = select.value;
+            const banner = document.getElementById('linkedProjectInfoBanner');
+            const nameEl = document.getElementById('linkedProjectName');
+            const badgeEl = document.getElementById('linkedProjectBadge');
+            const clientGroup = document.getElementById('incomeClientFieldsGroup');
+            const venueGroup = document.getElementById('incomeVenueGroup');
+
+            document.getElementById('formProjectId').value = projId;
+
+            if (projId && projId !== 'NON_PROJECT') {
+                const proj = transactions.find(t => t.id === projId);
+                if (proj) {
+                    document.getElementById('formClient').value = proj.client;
+                    document.getElementById('formEventCategory').value = proj.eventCategory || 'Wedding / Pernikahan';
+                    if (proj.venue) document.getElementById('formVenue').value = proj.venue;
+                    banner.classList.remove('hidden');
+                    nameEl.innerText = proj.client;
+                    badgeEl.innerText = proj.eventCategory || 'Wedding';
+                    clientGroup.classList.add('hidden');
+                    venueGroup.classList.add('hidden');
+                    return;
+                }
+            }
+
+            // Non project or not selected
+            banner.classList.add('hidden');
+            clientGroup.classList.remove('hidden');
+            venueGroup.classList.remove('hidden');
+            if (projId === 'NON_PROJECT') {
+                document.getElementById('formClient').value = 'Operasional Umum';
+            }
+        }
+
+        // DAY DETAIL MODAL
+        function openDayDetailModal(dateString, events) {
+            const modal = document.getElementById('dayDetailModal');
+            document.getElementById('dayDetailTitle').innerText = `Jadwal Tanggal: ${dateString}`;
+            document.getElementById('dayDetailSubtitle').innerText = `${events.length} Event / Transaksi Ditemukan`;
+
+            const content = document.getElementById('dayDetailContent');
+            content.innerHTML = '';
+
+            if (events.length === 0) {
+                content.innerHTML = `<p class="text-xs text-slate-400 italic text-center py-4">Tidak ada acara pada tanggal ini.</p>`;
+            } else {
+                events.forEach(item => {
+                    const isIncome = item.type === 'PEMASUKAN';
+                    const div = document.createElement('div');
+                    div.className = 'p-3.5 rounded-2xl bg-slate-900 border border-slate-800 space-y-2.5 hover:border-amber-400/50 transition cursor-pointer';
+                    div.onclick = () => {
+                        closeDayDetailModal();
+                        if (isIncome) openProjectResumeModal(item.id);
+                        else editTransaction(item.id);
+                    };
+
+                    if (isIncome) {
+                        const projectExpenses = getProjectExpenses(item);
+                        const totalExp = projectExpenses.reduce((sum, e) => sum + Number(e.amount || 0), 0);
+                        const contractVal = Number(item.totalProjectValue || item.amount || 0);
+                        const receivedVal = Number(item.amountReceived || item.amount || 0);
+                        const profit = contractVal - totalExp;
+
+                        div.innerHTML = `
+                            <div class="flex items-center justify-between">
+                                <div class="flex items-center gap-2">
+                                    <span class="text-xs font-bold text-amber-200">${escapeHtml(item.client)}</span>
+                                    ${getEventCategoryBadge(item.eventCategory)}
+                                </div>
+                                <span class="text-[10px] px-2 py-0.5 rounded bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 font-semibold">
+                                    PEMASUKAN
+                                </span>
+                            </div>
+                            <div class="text-xs space-y-1 bg-slate-950/60 p-2.5 rounded-xl border border-slate-800/80">
+                                <div class="flex justify-between text-slate-300">
+                                    <span>Total Kontrak: <strong class="text-amber-300">${formatRupiah(contractVal)}</strong></span>
+                                    <span>Terbayar: <strong class="text-emerald-400">${formatRupiah(receivedVal)}</strong></span>
+                                </div>
+                                <div class="flex justify-between text-[11px] text-slate-400 border-t border-slate-800 pt-1">
+                                    <span>Pengeluaran Vendor: <strong class="text-rose-400">${formatRupiah(totalExp)}</strong></span>
+                                    <span>Est. Profit: <strong class="${profit >= 0 ? 'text-amber-300' : 'text-rose-400'} font-semibold">${formatRupiah(profit)}</strong></span>
+                                </div>
+                            </div>
+                            <div class="flex items-center gap-1.5 pt-1">
+                                <button onclick="event.stopPropagation(); closeDayDetailModal(); openProjectResumeModal('${item.id}')" class="flex-1 py-1.5 px-2 rounded-xl bg-amber-500/15 hover:bg-amber-500/25 text-amber-300 border border-amber-500/30 text-[11px] font-bold flex items-center justify-center gap-1 transition" title="Lihat Resume Finansial Project">
+                                    <i class="fa-solid fa-file-invoice"></i>
+                                    <span>Resume</span>
+                                </button>
+                                <button onclick="event.stopPropagation(); closeDayDetailModal(); openInvoiceCustomizer('${item.id}')" class="flex-1 py-1.5 px-2 rounded-xl bg-sky-500/20 hover:bg-sky-500/30 text-sky-300 border border-sky-500/40 text-[11px] font-bold flex items-center justify-center gap-1 transition" title="Buat & Cetak Invoice Tagihan Customer">
+                                    <i class="fa-solid fa-file-invoice-dollar"></i>
+                                    <span>Invoice</span>
+                                </button>
+                                <button onclick="event.stopPropagation(); closeDayDetailModal(); openModal('PENGELUARAN', '${dateString}', '${item.id}')" class="flex-1 py-1.5 px-2 rounded-xl bg-rose-500/20 hover:bg-rose-500/30 text-rose-300 border border-rose-500/40 text-[11px] font-bold flex items-center justify-center gap-1 transition" title="Catat Pengeluaran Vendor">
+                                    <i class="fa-solid fa-receipt"></i>
+                                    <span>+ Biaya</span>
+                                </button>
+                            </div>
+                        `;
+                    } else {
+                        const linkedProj = item.projectId ? transactions.find(p => p.id === item.projectId) : transactions.find(p => p.type === 'PEMASUKAN' && p.client && item.client && p.client.toLowerCase() === item.client.toLowerCase());
+                        div.innerHTML = `
+                            <div class="flex items-center justify-between">
+                                <div class="flex items-center gap-2">
+                                    <span class="text-xs font-bold text-rose-300">${escapeHtml(item.vendorName || item.client || 'Pengeluaran')}</span>
+                                    <span class="px-2 py-0.5 rounded text-[10px] font-semibold bg-rose-500/20 text-rose-300 border border-rose-500/30">
+                                        ${escapeHtml(item.category || 'Vendor')}
+                                    </span>
+                                </div>
+                                <span class="text-[10px] px-2 py-0.5 rounded bg-rose-500/20 text-rose-300 border border-rose-500/30 font-semibold">
+                                    PENGELUARAN
+                                </span>
+                            </div>
+                            <div class="text-xs flex justify-between items-center bg-slate-950/60 p-2.5 rounded-xl border border-slate-800/80">
+                                <span class="text-slate-400">${linkedProj ? `Project: <strong class="text-amber-300/90">${escapeHtml(linkedProj.client)}</strong>` : (item.notes ? escapeHtml(item.notes) : 'Biaya Operasional')}</span>
+                                <span class="font-bold text-rose-400">${formatRupiah(item.amount)}</span>
+                            </div>
+                        `;
+                    }
+                    content.appendChild(div);
+                });
+            }
+
+            document.getElementById('addEventForDateBtn').onclick = () => {
+                closeDayDetailModal();
+                openModal('PEMASUKAN', dateString);
+            };
+
+            const addExpenseForDateBtn = document.getElementById('addExpenseForDateBtn');
+            if (addExpenseForDateBtn) {
+                addExpenseForDateBtn.onclick = () => {
+                    closeDayDetailModal();
+                    openModal('PENGELUARAN', dateString);
+                };
+            }
+
+            modal.classList.remove('hidden');
+        }
+
+        function closeDayDetailModal() {
+            document.getElementById('dayDetailModal').classList.add('hidden');
+        }
+
+        // PROJECT RESUME MODAL LOGIC
+        function openProjectResumeModal(id) {
+            const item = transactions.find(t => t.id === id);
+            if (!item) return;
+
+            activeResumeItem = item;
+
+            const modal = document.getElementById('projectResumeModal');
+
+            document.getElementById('resClientName').innerText = item.client;
+            document.getElementById('resEventCategoryBadge').innerHTML = getEventCategoryBadge(item.eventCategory);
+            document.getElementById('resVenueDate').innerHTML = `<i class="fa-regular fa-calendar-check text-amber-400 mr-1"></i> Tanggal: <strong>${item.date}</strong> | Venue: <strong>${item.venue || 'Gedung/Lokasi -'}</strong>`;
+
+            let statusClass = 'bg-amber-500/20 text-amber-300 border-amber-500/40';
+            if (item.status === 'Lunas') statusClass = 'bg-emerald-500/20 text-emerald-300 border-emerald-500/40';
+            if (item.status === 'Pending') statusClass = 'bg-rose-500/20 text-rose-300 border-rose-500/40';
+
+            document.getElementById('resStatusBadge').innerHTML = `
+                <span class="px-3 py-1 rounded-full text-xs font-bold border ${statusClass}">${item.status}</span>
+            `;
+
+            const totalVal = Number(item.totalProjectValue || item.amount || 0);
+            const receivedVal = Number(item.amountReceived || item.amount || 0);
+            const remainingVal = Number(item.remainingBalance || (totalVal - receivedVal));
+
+            document.getElementById('resTotalContract').innerText = formatRupiah(totalVal);
+            document.getElementById('resTotalReceived').innerText = formatRupiah(receivedVal);
+            document.getElementById('resRemainingBalance').innerText = formatRupiah(remainingVal);
+
+            // Progress percentage
+            const progress = totalVal > 0 ? Math.min(100, Math.round((receivedVal / totalVal) * 100)) : 100;
+            document.getElementById('resProgressPercent').innerText = `${progress}% Lunas`;
+            document.getElementById('resProgressBar').style.width = `${progress}%`;
+
+            // Contact & Notes
+            document.getElementById('resPhone').innerText = item.phone || '-';
+            document.getElementById('resServices').innerText = item.services || 'Paket Wedding / Event Standard RMA Project';
+            document.getElementById('resNotes').innerText = item.notes || 'Tidak ada catatan tambahan.';
+
+            // Render Project Expenses List & Profit Calculations
+            renderProjectExpensesList(item);
+
+            // WhatsApp Share link setup
+            const waPhone = (item.phone || '').replace(/[^0-9]/g, '');
+            const waText = encodeURIComponent(
+                `*RMA PROJECT WEDDING & EVENT ORGANIZER*\n` +
+                `------------------------------------\n` +
+                `*RESUME RINGKASAN PROJECT*\n\n` +
+                `*Klien:* ${item.client}\n` +
+                `*Kategori:* ${item.eventCategory || 'Wedding'}\n` +
+                `*Tanggal:* ${item.date}\n` +
+                `*Venue:* ${item.venue || '-'}\n\n` +
+                `*Total Nilai Kontrak:* ${formatRupiah(totalVal)}\n` +
+                `*Total Terbayar:* ${formatRupiah(receivedVal)}\n` +
+                `*Sisa Tagihan:* ${formatRupiah(remainingVal)}\n` +
+                `*Status:* ${item.status}\n\n` +
+                `Terima kasih telah memercayakan acara spesial Anda bersama RMA Project! ✨`
+            );
+
+            document.getElementById('resWaShareBtn').onclick = () => {
+                if (waPhone) {
+                    window.open(`https://wa.me/${waPhone}?text=${waText}`, '_blank');
+                } else {
+                    window.open(`https://wa.me/?text=${waText}`, '_blank');
+                }
+            };
+
+            modal.classList.remove('hidden');
+        }
+
+        function closeResumeModal() {
+            document.getElementById('projectResumeModal').classList.add('hidden');
+        }
+
+        // RENDER PROJECT EXPENSES IN RESUME MODAL
+        function renderProjectExpensesList(project) {
+            const expenses = getProjectExpenses(project);
+            const totalExp = expenses.reduce((sum, e) => sum + Number(e.amount || 0), 0);
+            const contractVal = Number(project.totalProjectValue || project.amount || 0);
+            const receivedVal = Number(project.amountReceived || project.amount || 0);
+            const contractProfit = contractVal - totalExp;
+            const cashProfit = receivedVal - totalExp;
+
+            document.getElementById('resLinkedExpense').innerText = formatRupiah(totalExp);
+            if (document.getElementById('resContractProfit')) {
+                document.getElementById('resContractProfit').innerText = formatRupiah(contractProfit);
+            }
+            document.getElementById('resEstimatedProfit').innerText = formatRupiah(cashProfit);
+
+            const listContainer = document.getElementById('resExpensesList');
+            if (!listContainer) return;
+            listContainer.innerHTML = '';
+
+            if (expenses.length === 0) {
+                listContainer.innerHTML = `
+                    <div class="text-center py-6 px-4 bg-slate-950/40 rounded-xl border border-dashed border-slate-800 text-slate-400 space-y-1.5">
+                        <i class="fa-solid fa-receipt text-2xl text-slate-600 mb-1"></i>
+                        <p class="text-xs">Belum ada biaya vendor tercatat untuk project ini.</p>
+                        <button type="button" onclick="openModalForActiveProject()" class="text-xs text-rose-300 hover:text-white font-bold inline-flex items-center gap-1 underline transition">
+                            + Catat Pengeluaran Vendor Pertama
+                        </button>
+                    </div>
+                `;
+                return;
+            }
+
+            expenses.forEach(exp => {
+                const row = document.createElement('div');
+                row.className = 'flex items-center justify-between p-2.5 rounded-xl bg-slate-950/80 border border-slate-800/90 text-xs hover:border-rose-500/30 transition';
+                row.innerHTML = `
+                    <div class="flex items-center gap-2.5 min-w-0">
+                        <span class="px-2 py-0.5 rounded text-[10px] font-bold bg-rose-500/20 text-rose-300 border border-rose-500/30 shrink-0">
+                            ${escapeHtml(exp.category || 'Vendor')}
+                        </span>
+                        <div class="truncate">
+                            <p class="font-semibold text-slate-200 truncate">${escapeHtml(exp.vendorName || exp.notes || exp.category || 'Biaya Vendor')}</p>
+                            <p class="text-[10px] text-slate-400">${exp.date || ''} ${exp.status ? `• ${exp.status}` : ''}</p>
+                        </div>
+                    </div>
+                    <div class="flex items-center gap-2 shrink-0">
+                        <span class="font-bold text-rose-400">${formatRupiah(exp.amount)}</span>
+                        <button type="button" onclick="deleteExpenseFromResume('${exp.id}')" class="p-1 rounded text-slate-500 hover:text-rose-400 transition no-print" title="Hapus Biaya">
+                            <i class="fa-solid fa-trash-can text-xs"></i>
+                        </button>
+                    </div>
+                `;
+                listContainer.appendChild(row);
+            });
+        }
+
+        function openModalForActiveProject() {
+            if (!activeResumeItem) return;
+            openModal('PENGELUARAN', activeResumeItem.date, activeResumeItem.id);
+        }
+
+        function deleteExpenseFromResume(expenseId) {
+            if (confirm('Hapus catatan pengeluaran vendor ini?')) {
+                transactions = transactions.filter(t => t.id !== expenseId);
+                saveTransactions();
+                renderDashboard();
+                renderCalendar();
+                renderUpcomingEvents();
+                renderTable();
+                updateCharts();
+                if (activeResumeItem) {
+                    renderProjectExpensesList(activeResumeItem);
+                }
+                showToast('Pengeluaran berhasil dihapus!', 'info');
+            }
+        }
+
+        // TABLE & FILTERS
+        function getFilteredTransactions() {
+            const search = document.getElementById('searchInput').value.toLowerCase();
+            const eventCat = document.getElementById('eventCategoryFilter').value;
+            const type = document.getElementById('typeFilter').value;
+            const category = document.getElementById('categoryFilter').value;
+            const status = document.getElementById('statusFilter').value;
+
+            return transactions.filter(t => {
+                const matchSearch = (t.client && t.client.toLowerCase().includes(search)) ||
+                                    (t.vendorName && t.vendorName.toLowerCase().includes(search)) ||
+                                    (t.notes && t.notes.toLowerCase().includes(search)) ||
+                                    (t.venue && t.venue.toLowerCase().includes(search));
+                const matchEventCat = eventCat === 'ALL' || (t.eventCategory || 'Wedding / Pernikahan') === eventCat;
+                const matchType = type === 'ALL' || t.type === type;
+                const matchCategory = category === 'ALL' || t.category === category;
+                const matchStatus = status === 'ALL' || t.status === status;
+
+                return matchSearch && matchEventCat && matchType && matchCategory && matchStatus;
+            }).sort((a, b) => new Date(b.date) - new Date(a.date));
+        }
+
+        function applyFilters() {
+            renderTable();
+        }
+
+        function renderTable() {
+            const filtered = getFilteredTransactions();
+            const tbody = document.getElementById('transactionTableBody');
+            const emptyState = document.getElementById('emptyState');
+
+            tbody.innerHTML = '';
+
+            if (filtered.length === 0) {
+                emptyState.classList.remove('hidden');
+                return;
+            } else {
+                emptyState.classList.add('hidden');
+            }
+
+            filtered.forEach(t => {
+                const tr = document.createElement('tr');
+                tr.className = 'hover:bg-slate-800/50 transition border-b border-slate-800/80';
+
+                const isIncome = t.type === 'PEMASUKAN';
+                let statusBadgeClass = 'bg-slate-700/40 text-slate-300 border-slate-600';
+                if (t.status === 'Lunas') statusBadgeClass = 'bg-emerald-500/20 text-emerald-300 border-emerald-500/40';
+                if (t.status === 'DP') statusBadgeClass = 'bg-amber-500/20 text-amber-300 border-amber-500/40';
+                if (t.status === 'Pending') statusBadgeClass = 'bg-rose-500/20 text-rose-300 border-rose-500/40';
+
+                const statusBadge = `<span class="px-2 py-0.5 rounded text-[10px] font-medium border ${statusBadgeClass}">${t.status || 'Lunas'}</span>`;
+                const linkedProject = t.projectId ? transactions.find(p => p.id === t.projectId) : transactions.find(p => p.type === 'PEMASUKAN' && p.client && t.client && p.client.toLowerCase() === t.client.toLowerCase());
+
+                tr.innerHTML = `
+                    <td class="p-3 whitespace-nowrap text-slate-400">${t.date}</td>
+                    <td class="p-3 font-semibold ${isIncome ? 'text-amber-100' : 'text-slate-200'}">
+                        ${isIncome ? escapeHtml(t.client) : escapeHtml(t.vendorName || t.client || 'Pengeluaran Vendor')}
+                        ${isIncome && t.venue ? `<span class="block text-[10px] font-normal text-slate-400"><i class="fa-solid fa-location-dot mr-1"></i>${escapeHtml(t.venue)}</span>` : ''}
+                        ${!isIncome && (linkedProject || t.client) ? `<span class="block text-[10px] font-normal text-amber-300/80"><i class="fa-solid fa-link mr-1"></i>Project: ${escapeHtml(linkedProject ? linkedProject.client : t.client)}</span>` : ''}
+                    </td>
+                    <td class="p-3 whitespace-nowrap">
+                        ${isIncome ? getEventCategoryBadge(t.eventCategory) : `<span class="px-2 py-0.5 rounded text-[10px] font-semibold bg-rose-500/20 text-rose-300 border border-rose-500/30">${escapeHtml(t.category || 'Vendor')}</span>`}
+                    </td>
+                    <td class="p-3 font-bold whitespace-nowrap text-amber-300">
+                        ${isIncome ? formatRupiah(t.totalProjectValue || t.amount) : '<span class="text-slate-500 font-normal">-</span>'}
+                    </td>
+                    <td class="p-3 font-bold whitespace-nowrap text-emerald-400">
+                        ${isIncome ? formatRupiah(t.amountReceived || t.amount) : '<span class="text-slate-500 font-normal">-</span>'}
+                    </td>
+                    <td class="p-3 font-bold whitespace-nowrap ${isIncome ? 'text-rose-400' : 'text-rose-400'}">
+                        ${isIncome ? formatRupiah(t.remainingBalance || 0) : `Biaya: ${formatRupiah(t.amount)}`}
+                    </td>
+                    <td class="p-3 whitespace-nowrap">${statusBadge}</td>
+                    <td class="p-3 text-center whitespace-nowrap">
+                        <div class="flex items-center justify-center gap-1.5">
+                            ${isIncome ? `
+                            <button onclick="openProjectResumeModal('${t.id}')" class="px-2 py-1 rounded bg-amber-500/20 hover:bg-amber-500/30 text-amber-300 border border-amber-500/40 font-bold text-[10px] flex items-center gap-1 transition" title="Lihat Resume Project">
+                                <i class="fa-solid fa-file-invoice"></i>
+                                <span>Resume</span>
+                            </button>
+                            <button onclick="openInvoiceCustomizer('${t.id}')" class="px-2 py-1 rounded bg-sky-500/20 hover:bg-sky-500/30 text-sky-300 border border-sky-500/40 font-bold text-[10px] flex items-center gap-1 transition" title="Buat & Cetak Invoice Tagihan Customer">
+                                <i class="fa-solid fa-file-invoice-dollar"></i>
+                                <span>Invoice</span>
+                            </button>
+                            <button onclick="openModal('PENGELUARAN', null, '${t.id}')" class="px-2 py-1 rounded bg-rose-500/20 hover:bg-rose-500/30 text-rose-300 border border-rose-500/40 font-bold text-[10px] flex items-center gap-1 transition" title="Catat Pengeluaran Project Ini">
+                                <i class="fa-solid fa-receipt"></i>
+                                <span>+ Biaya</span>
+                            </button>
+                            ` : ''}
+                            <button onclick="editTransaction('${t.id}')" class="p-1.5 rounded bg-slate-800 hover:bg-amber-500/20 text-amber-300 border border-slate-700 transition" title="Edit">
+                                <i class="fa-solid fa-pen text-xs"></i>
+                            </button>
+                            <button onclick="deleteTransaction('${t.id}')" class="p-1.5 rounded bg-slate-800 hover:bg-rose-500/20 text-rose-400 border border-slate-700 transition" title="Hapus">
+                                <i class="fa-solid fa-trash-can text-xs"></i>
+                            </button>
+                        </div>
+                    </td>
+                `;
+
+                tbody.appendChild(tr);
+            });
+        }
+
+        function escapeHtml(str) {
+            if (!str) return '';
+            return str.replace(/&/g, "&amp;")
+                      .replace(/</g, "&lt;")
+                      .replace(/>/g, "&gt;")
+                      .replace(/"/g, "&quot;")
+                      .replace(/'/g, "&#039;");
+        }
+
+        // FORM CONTROLS & CALCULATIONS
+        function openModal(defaultType = 'PEMASUKAN', targetDate = null, targetProjectId = null) {
+            const modal = document.getElementById('transactionModal');
+            const form = document.getElementById('transactionForm');
+
+            form.reset();
+            document.getElementById('editId').value = '';
+            document.getElementById('formProjectId').value = targetProjectId || '';
+            document.getElementById('formType').value = defaultType;
+            document.getElementById('formEventCategory').value = 'Wedding / Pernikahan';
+
+            populateExpenseProjectOptions(targetProjectId);
+
+            if (targetProjectId) {
+                const proj = transactions.find(t => t.id === targetProjectId);
+                if (proj) {
+                    document.getElementById('formClient').value = proj.client;
+                    document.getElementById('formEventCategory').value = proj.eventCategory || 'Wedding / Pernikahan';
+                    if (proj.venue) document.getElementById('formVenue').value = proj.venue;
+                    if (!targetDate && proj.date) {
+                        targetDate = proj.date;
+                    }
+                }
+            }
+
+            toggleFormFields();
+
+            if (targetDate) {
+                document.getElementById('formDate').value = targetDate;
+            } else {
+                setDefaultDate();
+            }
+
+            modal.classList.remove('hidden');
+        }
+
+        function closeModal() {
+            document.getElementById('transactionModal').classList.add('hidden');
+        }
+
+        function toggleFormFields() {
+            const type = document.getElementById('formType').value;
+            const isExpense = type === 'PENGELUARAN';
+
+            const incomeEventCategoryGroup = document.getElementById('incomeEventCategoryGroup');
+            const expenseProjectSelectGroup = document.getElementById('expenseProjectSelectGroup');
+            const incomeClientFieldsGroup = document.getElementById('incomeClientFieldsGroup');
+            const incomeVenueGroup = document.getElementById('incomeVenueGroup');
+            const incomeFieldsGroup = document.getElementById('incomeFieldsGroup');
+            const expenseFieldsGroup = document.getElementById('expenseFieldsGroup');
+            const incomeStatusServicesGroup = document.getElementById('incomeStatusServicesGroup');
+            const linkedProjectInfoBanner = document.getElementById('linkedProjectInfoBanner');
+            const modalTitle = document.getElementById('modalTitle');
+
+            if (isExpense) {
+                incomeEventCategoryGroup.classList.add('hidden');
+                expenseProjectSelectGroup.classList.remove('hidden');
+                incomeFieldsGroup.classList.add('hidden');
+                incomeStatusServicesGroup.classList.add('hidden');
+                expenseFieldsGroup.classList.remove('hidden');
+
+                const projId = document.getElementById('formProjectId').value;
+                const proj = transactions.find(t => t.id === projId);
+                if (proj) {
+                    incomeClientFieldsGroup.classList.add('hidden');
+                    incomeVenueGroup.classList.add('hidden');
+                    linkedProjectInfoBanner.classList.remove('hidden');
+                    document.getElementById('linkedProjectName').innerText = proj.client;
+                    document.getElementById('linkedProjectBadge').innerText = proj.eventCategory || 'Wedding';
+                    modalTitle.innerHTML = `<i class="fa-solid fa-receipt text-rose-400"></i><span>Catat Biaya Vendor: ${escapeHtml(proj.client)}</span>`;
+                } else {
+                    incomeClientFieldsGroup.classList.remove('hidden');
+                    incomeVenueGroup.classList.remove('hidden');
+                    linkedProjectInfoBanner.classList.add('hidden');
+                    modalTitle.innerHTML = `<i class="fa-solid fa-receipt text-rose-400"></i><span>Tambah Pengeluaran Vendor</span>`;
+                }
+            } else {
+                incomeEventCategoryGroup.classList.remove('hidden');
+                expenseProjectSelectGroup.classList.add('hidden');
+                incomeClientFieldsGroup.classList.remove('hidden');
+                incomeVenueGroup.classList.remove('hidden');
+                incomeFieldsGroup.classList.remove('hidden');
+                incomeStatusServicesGroup.classList.remove('hidden');
+                expenseFieldsGroup.classList.add('hidden');
+                linkedProjectInfoBanner.classList.add('hidden');
+                modalTitle.innerHTML = `<i class="fa-solid fa-pen-to-square text-amber-400"></i><span>Tambah Project / Input Pemasukan</span>`;
+                calculateBalance();
+            }
+        }
+
+        function calculateBalance() {
+            const totalVal = parseFloat(document.getElementById('formTotalProjectValue').value) || 0;
+            const receivedVal = parseFloat(document.getElementById('formAmountReceived').value) || 0;
+            const remaining = Math.max(0, totalVal - receivedVal);
+
+            document.getElementById('calculatedRemaining').innerText = formatRupiah(remaining);
+
+            // Auto-select payment status
+            const statusSelect = document.getElementById('formStatus');
+            if (statusSelect.value === 'AUTO' || statusSelect.value === 'Lunas' || statusSelect.value === 'DP' || statusSelect.value === 'Pending') {
+                if (totalVal > 0 && receivedVal >= totalVal) {
+                    statusSelect.value = 'Lunas';
+                } else if (receivedVal > 0 && receivedVal < totalVal) {
+                    statusSelect.value = 'DP';
+                } else {
+                    statusSelect.value = 'Pending';
+                }
+            }
+        }
+
+        function handleFormSubmit(e) {
+            e.preventDefault();
+
+            const editId = document.getElementById('editId').value;
+            const type = document.getElementById('formType').value;
+            let projectId = document.getElementById('formProjectId').value;
+            let client = document.getElementById('formClient').value.trim();
+            let eventCategory = document.getElementById('formEventCategory').value;
+            let phone = document.getElementById('formPhone').value.trim();
+            const date = document.getElementById('formDate').value;
+            let venue = document.getElementById('formVenue').value.trim();
+            const services = document.getElementById('formServices').value.trim();
+            const notes = document.getElementById('formNotes').value.trim();
+
+            let totalProjectValue = 0;
+            let amountReceived = 0;
+            let remainingBalance = 0;
+            let category = 'Kontrak Package / All-In';
+            let amount = 0;
+            let vendorName = '';
+            let status = 'Lunas';
+
+            if (type === 'PEMASUKAN') {
+                totalProjectValue = parseFloat(document.getElementById('formTotalProjectValue').value) || 0;
+                amountReceived = parseFloat(document.getElementById('formAmountReceived').value) || 0;
+                remainingBalance = Math.max(0, totalProjectValue - amountReceived);
+                amount = amountReceived; // actual cash in
+
+                status = document.getElementById('formStatus').value;
+                if (status === 'AUTO') {
+                    if (totalProjectValue > 0 && amountReceived >= totalProjectValue) status = 'Lunas';
+                    else if (amountReceived > 0) status = 'DP';
+                    else status = 'Pending';
+                }
+            } else {
+                category = document.getElementById('formCategory').value;
+                vendorName = document.getElementById('formVendorName').value.trim();
+                amount = parseFloat(document.getElementById('formExpenseAmount').value) || 0;
+                status = document.getElementById('formExpenseStatus').value || 'Lunas';
+
+                // If linked to project
+                if (projectId && projectId !== 'NON_PROJECT') {
+                    const proj = transactions.find(t => t.id === projectId);
+                    if (proj) {
+                        client = proj.client;
+                        eventCategory = proj.eventCategory || 'Wedding / Pernikahan';
+                        if (!venue) venue = proj.venue || '';
+                    }
+                } else {
+                    projectId = '';
+                    if (!client) client = 'Operasional Umum';
+                }
+            }
+
+            if (!client || (type === 'PEMASUKAN' && totalProjectValue <= 0) || (type === 'PENGELUARAN' && amount <= 0)) {
+                showToast('Isi data nominal & nama project dengan lengkap!', 'error');
+                return;
+            }
+
+            if (editId) {
+                const index = transactions.findIndex(t => t.id === editId);
+                if (index !== -1) {
+                    transactions[index] = {
+                        ...transactions[index],
+                        id: editId, type, projectId, eventCategory, client, vendorName, phone, date, venue,
+                        totalProjectValue, amountReceived, remainingBalance, category, amount,
+                        status, services, notes
+                    };
+                    showToast(type === 'PENGELUARAN' ? 'Pengeluaran vendor diperbarui!' : 'Data project berhasil diperbarui!');
+                }
+            } else {
+                const newItem = {
+                    id: Date.now().toString(),
+                    type, projectId, eventCategory, client, vendorName, phone, date, venue,
+                    totalProjectValue, amountReceived, remainingBalance, category, amount,
+                    status, services, notes
+                };
+                transactions.push(newItem);
+                showToast(type === 'PENGELUARAN' ? `Biaya vendor untuk ${client} tersimpan!` : 'Project baru berhasil didaftarkan!');
+            }
+
+            saveTransactions();
+            renderDashboard();
+            renderCalendar();
+            renderUpcomingEvents();
+            renderTable();
+            updateCharts();
+            closeModal();
+
+            // Auto-refresh active resume modal if open
+            if (activeResumeItem && (!document.getElementById('projectResumeModal').classList.contains('hidden'))) {
+                const currentProj = transactions.find(t => t.id === activeResumeItem.id);
+                if (currentProj) {
+                    activeResumeItem = currentProj;
+                    renderProjectExpensesList(currentProj);
+                }
+            }
+        }
+
+        function editTransaction(id) {
+            const item = transactions.find(t => t.id === id);
+            if (!item) return;
+
+            openModal(item.type, item.date, item.projectId || null);
+
+            document.getElementById('editId').value = item.id;
+            document.getElementById('formType').value = item.type;
+            document.getElementById('formProjectId').value = item.projectId || '';
+            document.getElementById('formEventCategory').value = item.eventCategory || 'Wedding / Pernikahan';
+            document.getElementById('formClient').value = item.client;
+            document.getElementById('formPhone').value = item.phone || '';
+            document.getElementById('formDate').value = item.date;
+            document.getElementById('formVenue').value = item.venue || '';
+            document.getElementById('formServices').value = item.services || '';
+            document.getElementById('formNotes').value = item.notes || '';
+
+            toggleFormFields();
+
+            if (item.type === 'PEMASUKAN') {
+                document.getElementById('formTotalProjectValue').value = item.totalProjectValue || item.amount;
+                document.getElementById('formAmountReceived').value = item.amountReceived || item.amount;
+                document.getElementById('formStatus').value = item.status;
+                calculateBalance();
+            } else {
+                document.getElementById('formCategory').value = item.category || 'Catering';
+                document.getElementById('formVendorName').value = item.vendorName || '';
+                document.getElementById('formExpenseAmount').value = item.amount;
+                document.getElementById('formExpenseStatus').value = item.status || 'Lunas';
+            }
+        }
+
+        function deleteTransaction(id) {
+            if (confirm('Apakah Anda yakin ingin menghapus data ini?')) {
+                transactions = transactions.filter(t => t.id !== id);
+                saveTransactions();
+                renderDashboard();
+                renderCalendar();
+                renderUpcomingEvents();
+                renderTable();
+                updateCharts();
+                showToast('Data berhasil dihapus!', 'info');
+            }
+        }
+
+        function showToast(message, type = 'success') {
+            const toast = document.getElementById('toast');
+            const toastMessage = document.getElementById('toastMessage');
+            const toastIcon = document.getElementById('toastIcon');
+
+            toastMessage.innerText = message;
+
+            if (type === 'error') {
+                toastIcon.innerHTML = `<i class="fa-solid fa-circle-exclamation text-rose-400"></i>`;
+            } else if (type === 'info') {
+                toastIcon.innerHTML = `<i class="fa-solid fa-circle-info text-sky-400"></i>`;
+            } else {
+                toastIcon.innerHTML = `<i class="fa-solid fa-circle-check text-emerald-400"></i>`;
+            }
+
+            toast.classList.remove('translate-y-20', 'opacity-0');
+            setTimeout(() => {
+                toast.classList.add('translate-y-20', 'opacity-0');
+            }, 3000);
+        }
+
+        function exportToCSV() {
+            if (transactions.length === 0) {
+                showToast('Tidak ada data untuk diekspor!', 'error');
+                return;
+            }
+
+            let csvContent = "data:text/csv;charset=utf-8,";
+            csvContent += "ID,Tanggal,Kategori Acara,Klien/Project,No WA,Venue,Total Nilai Kontrak,Uang Diterima,Sisa Piutang,Jenis,Status,Services,Notes\n";
+
+            transactions.forEach(t => {
+                const row = `"${t.id}","${t.date}","${t.eventCategory || 'Wedding'}","${(t.client||'').replace(/"/g, '""')}","${t.phone||''}","${(t.venue||'').replace(/"/g, '""')}","${t.totalProjectValue||t.amount||0}","${t.amountReceived||t.amount||0}","${t.remainingBalance||0}","${t.type}","${t.status}","${(t.services||'').replace(/"/g, '""')}","${(t.notes||'').replace(/"/g, '""')}"`;
+                csvContent += row + "\n";
+            });
+
+            const encodedUri = encodeURI(csvContent);
+            const link = document.createElement("a");
+            link.setAttribute("href", encodedUri);
+            link.setAttribute("download", `Project_Resume_RMA_${new Date().toISOString().split('T')[0]}.csv`);
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+
+            showToast('File CSV berhasil diunduh!');
+        }
+
+        // CHARTS LOGIC
+        function initCharts() {
+            const ctx1 = document.getElementById('financialChart').getContext('2d');
+            financialChartInstance = new Chart(ctx1, {
+                type: 'bar',
+                data: getMonthlyChartData(),
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { labels: { color: '#94a3b8', font: { family: 'Plus Jakarta Sans', size: 11 } } }
+                    },
+                    scales: {
+                        x: { ticks: { color: '#94a3b8' }, grid: { color: 'rgba(51, 65, 85, 0.3)' } },
+                        y: {
+                            ticks: {
+                                color: '#94a3b8',
+                                callback: value => 'Rp ' + (value / 1000000) + ' Jt'
+                            },
+                            grid: { color: 'rgba(51, 65, 85, 0.3)' }
+                        }
+                    }
+                }
+            });
+
+            const ctx2 = document.getElementById('categoryChart').getContext('2d');
+            categoryChartInstance = new Chart(ctx2, {
+                type: 'doughnut',
+                data: getCategoryChartData(),
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'bottom',
+                            labels: { color: '#94a3b8', font: { size: 10, family: 'Plus Jakarta Sans' } }
+                        }
+                    }
+                }
+            });
+        }
+
+        function updateCharts() {
+            if (financialChartInstance && categoryChartInstance) {
+                financialChartInstance.data = getMonthlyChartData();
+                financialChartInstance.update();
+
+                categoryChartInstance.data = getCategoryChartData();
+                categoryChartInstance.update();
+            }
+        }
+
+        function getMonthlyChartData() {
+            const months = ['Jan', 'Feb', 'Mar', 'Apr', 'Mei', 'Jun', 'Jul', 'Agu', 'Sep', 'Okt', 'Nov', 'Des'];
+            const contractPerMonth = new Array(12).fill(0);
+            const receivedPerMonth = new Array(12).fill(0);
+            const expensePerMonth = new Array(12).fill(0);
+
+            transactions.forEach(t => {
+                if (t.date) {
+                    const monthIndex = new Date(t.date).getMonth();
+                    if (t.type === 'PEMASUKAN') {
+                        contractPerMonth[monthIndex] += Number(t.totalProjectValue || t.amount || 0);
+                        receivedPerMonth[monthIndex] += Number(t.amountReceived || t.amount || 0);
+                    } else if (t.type === 'PENGELUARAN') {
+                        expensePerMonth[monthIndex] += Number(t.amount || 0);
+                    }
+                }
+            });
+
+            return {
+                labels: months,
+                datasets: [
+                    {
+                        label: 'Nilai Kontrak',
+                        data: contractPerMonth,
+                        backgroundColor: 'rgba(212, 175, 55, 0.7)',
+                        borderColor: '#d4af37',
+                        borderWidth: 1,
+                        borderRadius: 4
+                    },
+                    {
+                        label: 'Cash Received',
+                        data: receivedPerMonth,
+                        backgroundColor: 'rgba(16, 185, 129, 0.7)',
+                        borderColor: '#10b981',
+                        borderWidth: 1,
+                        borderRadius: 4
+                    },
+                    {
+                        label: 'Pengeluaran',
+                        data: expensePerMonth,
+                        backgroundColor: 'rgba(244, 63, 94, 0.7)',
+                        borderColor: '#f43f5e',
+                        borderWidth: 1,
+                        borderRadius: 4
+                    }
+                ]
+            };
+        }
+
+        function getCategoryChartData() {
+            const eventTotals = {
+                'Wedding': 0,
+                'Tunangan': 0,
+                'Event Lainnya': 0
+            };
+
+            transactions.filter(t => t.type === 'PEMASUKAN').forEach(t => {
+                const cat = t.eventCategory || 'Wedding / Pernikahan';
+                const val = Number(t.totalProjectValue || t.amount || 0);
+                if (cat.includes('Wedding')) eventTotals['Wedding'] += val;
+                else if (cat.includes('Engagement') || cat.includes('Tunangan')) eventTotals['Tunangan'] += val;
+                else eventTotals['Event Lainnya'] += val;
+            });
+
+            const labels = Object.keys(eventTotals);
+            const data = Object.values(eventTotals);
+            const hasData = data.some(v => v > 0);
+
+            return {
+                labels: hasData ? labels : ['Belum Ada Data'],
+                datasets: [{
+                    data: hasData ? data : [1],
+                    backgroundColor: hasData ? ['#f43f5e', '#f59e0b', '#38bdf8'] : ['#334155'],
+                    borderWidth: 2,
+                    borderColor: '#0f172a'
+                }]
+            };
+        }
+
+        // ==========================================
+        // FITUR INVOICE TAGIHAN CUSTOMER & CUSTOMISER
+        // ==========================================
+        let activeInvoiceProject = null;
+        let customInvoiceItems = [];
+        let sigCanvas = null;
+        let sigCtx = null;
+        let isDrawingSignature = false;
+        let signatureInitialized = false;
+
+        // HELPER: TERBILANG RUPIAH INDONESIA
+        function angkaTerbilang(nilai) {
+            nilai = Math.floor(Math.abs(nilai));
+            if (nilai === 0) return "Nol";
+            const huruf = ["", "Satu", "Dua", "Tiga", "Empat", "Lima", "Enam", "Tujuh", "Delapan", "Sembilan", "Sepuluh", "Sebelas"];
+            
+            function convert(n) {
+                if (n < 12) return huruf[n];
+                if (n < 20) return convert(n - 10) + " Belas";
+                if (n < 100) return (convert(Math.floor(n / 10)) + " Puluh " + convert(n % 10)).trim();
+                if (n < 200) return ("Seratus " + convert(n - 100)).trim();
+                if (n < 1000) return (convert(Math.floor(n / 100)) + " Ratus " + convert(n % 100)).trim();
+                if (n < 2000) return ("Seribu " + convert(n - 1000)).trim();
+                if (n < 1000000) return (convert(Math.floor(n / 1000)) + " Ribu " + convert(n % 1000)).trim();
+                if (n < 1000000000) return (convert(Math.floor(n / 1000000)) + " Juta " + convert(n % 1000000)).trim();
+                if (n < 1000000000000) return (convert(Math.floor(n / 1000000000)) + " Miliar " + convert(n % 1000000000)).trim();
+                return "";
+            }
+
+            return convert(nilai).replace(/\s+/g, " ").trim();
+        }
+
+        // HELPER: FORMAT TANGGAL INDONESIA
+        function formatIndonesianDate(dateStr) {
+            if (!dateStr) return '-';
+            const parts = dateStr.split('-');
+            if (parts.length !== 3) return dateStr;
+            const year = parts[0];
+            const monthIdx = parseInt(parts[1], 10) - 1;
+            const day = parseInt(parts[2], 10);
+            const months = [
+                "Januari", "Februari", "Maret", "April", "Mei", "Juni",
+                "Juli", "Agustus", "September", "Oktober", "November", "Desember"
+            ];
+            return `${day} ${months[monthIdx] || ''} ${year}`;
+        }
+
+        // HELPER: FORMAT PHONE FOR WHATSAPP
+        function formatPhoneForWA(phone) {
+            if (!phone) return '';
+            let cleaned = phone.replace(/[^0-9]/g, '');
+            if (cleaned.startsWith('0')) {
+                cleaned = '62' + cleaned.substring(1);
+            }
+            return cleaned;
+        }
+
+        // BUKA MODAL CUSTOMISE INVOICE
+        function openInvoiceCustomizer(projectId) {
+            if (!projectId) {
+                showToast('Pilih project terlebih dahulu!', 'error');
+                return;
+            }
+
+            const project = transactions.find(t => t.id === projectId);
+            if (!project) {
+                showToast('Data project tidak ditemukan!', 'error');
+                return;
+            }
+
+            activeInvoiceProject = project;
+            const custom = project.customInvoice || {};
+
+            document.getElementById('invModalSubtitle').innerText = `Project: ${project.client} • Hanya menghitung Nilai Project dikurangi Uang Masuk`;
+
+            // 1. Nomor & Tanggal
+            const defaultDateStr = project.date ? project.date.replace(/-/g, '').slice(0, 6) : new Date().toISOString().slice(0, 7).replace(/-/g, '');
+            const defaultInvNum = `INV/RMA/${defaultDateStr}/${project.id ? project.id.slice(-3) : '001'}`;
+            document.getElementById('invNumber').value = custom.invNumber || defaultInvNum;
+            document.getElementById('invDate').value = custom.invDate || (new Date().toISOString().split('T')[0]);
+            document.getElementById('invDueDate').value = custom.invDueDate || project.date || (new Date().toISOString().split('T')[0]);
+
+            // Status Tagihan
+            const contractVal = Number(project.totalProjectValue || project.amount || 0);
+            const receivedVal = Number(project.amountReceived || project.amount || 0);
+            let defaultStatus = 'BELUM LUNAS';
+            if (contractVal > 0 && receivedVal >= contractVal) defaultStatus = 'LUNAS';
+            else if (receivedVal > 0) defaultStatus = 'TERMIN 1 - DP';
+            document.getElementById('invStatus').value = custom.invStatus || defaultStatus;
+
+            // 2. Data Customer & Acara
+            document.getElementById('invCustomerName').value = custom.customerName || project.client || '';
+            document.getElementById('invCustomerPhone').value = custom.customerPhone || project.phone || '';
+            document.getElementById('invCustomerAddress').value = custom.customerAddress || '';
+            document.getElementById('invEventCategory').value = custom.eventCategory || project.eventCategory || 'Wedding / Pernikahan';
+            document.getElementById('invEventDate').value = custom.eventDate || project.date || '';
+            document.getElementById('invEventVenue').value = custom.eventVenue || project.venue || '';
+
+            // 3. Rincian Paket & Uang Masuk
+            document.getElementById('invItemDesc').value = custom.itemDesc || (project.services ? `Paket: ${project.services}` : 'Paket Wedding Organizer & All-In Services');
+            document.getElementById('invTotalProjectValue').value = custom.totalProjectValue !== undefined ? custom.totalProjectValue : contractVal;
+            document.getElementById('invReceivedDesc').value = custom.receivedDesc || 'Pembayaran Telah Diterima (DP / Cicilan)';
+            document.getElementById('invAmountReceived').value = custom.amountReceived !== undefined ? custom.amountReceived : receivedVal;
+
+            customInvoiceItems = custom.customItems ? JSON.parse(JSON.stringify(custom.customItems)) : [];
+
+            // 4. Rekening Bank
+            document.getElementById('invBankName').value = custom.bankName || 'Bank BCA';
+            document.getElementById('invBankAccountNumber').value = custom.bankAccountNumber || '123-456-7890';
+            document.getElementById('invBankAccountName').value = custom.bankAccountName || 'RMA Project Wedding Organizer';
+            document.getElementById('invBankNotes').value = custom.bankNotes || '* Mohon cantumkan No. Invoice pada berita transfer';
+
+            // 5. Terms & Conditions
+            const defaultTerms = `1. Pembayaran pelunasan wajib diselesaikan paling lambat H-7 sebelum hari pelaksanaan acara.
+2. Pembayaran hanya sah apabila ditransfer ke rekening resmi RMA Project di atas.
+3. Bukti transfer mohon dikirimkan melalui WhatsApp Official RMA Project untuk konfirmasi otomatis.`;
+            document.getElementById('invTerms').value = custom.terms || defaultTerms;
+
+            // 6. Tanda Tangan Owner RMA Project
+            document.getElementById('invSignCity').value = custom.signCity || 'Bandung';
+            document.getElementById('invSignDate').value = custom.signDate || formatIndonesianDate(new Date().toISOString().split('T')[0]);
+            document.getElementById('invOwnerName').value = custom.ownerName || 'Owner RMA Project';
+            document.getElementById('invOwnerTitle').value = custom.ownerTitle || 'Owner & Founder RMA Project';
+
+            document.getElementById('invIncludeStamp').checked = custom.includeStamp !== false;
+            document.getElementById('invManualSign').checked = Boolean(custom.manualSign);
+
+            // Buka Modal
+            document.getElementById('invoiceCustomizerModal').classList.remove('hidden');
+
+            // Inisialisasi Signature Pad Canvas
+            initSignaturePad();
+
+            // Load saved signature if available
+            if (custom.signatureDataUrl) {
+                const img = new Image();
+                img.onload = () => {
+                    if (sigCtx && sigCanvas) {
+                        sigCtx.clearRect(0, 0, sigCanvas.width, sigCanvas.height);
+                        sigCtx.drawImage(img, 0, 0);
+                        updateSignaturePreview();
+                    }
+                };
+                img.src = custom.signatureDataUrl;
+            } else {
+                clearSignatureCanvas();
+            }
+
+            renderCustomInvoiceItemsInputs();
+            renderInvoicePreview();
+        }
+
+        // TUTUP MODAL CUSTOMISE & SIMPAN
+        function closeInvoiceCustomizer() {
+            saveInvoiceCustomization();
+            document.getElementById('invoiceCustomizerModal').classList.add('hidden');
+        }
+
+        function saveInvoiceCustomization() {
+            if (!activeInvoiceProject) return;
+
+            const custom = {
+                invNumber: document.getElementById('invNumber').value.trim(),
+                invDate: document.getElementById('invDate').value,
+                invDueDate: document.getElementById('invDueDate').value,
+                invStatus: document.getElementById('invStatus').value,
+                customerName: document.getElementById('invCustomerName').value.trim(),
+                customerPhone: document.getElementById('invCustomerPhone').value.trim(),
+                customerAddress: document.getElementById('invCustomerAddress').value.trim(),
+                eventCategory: document.getElementById('invEventCategory').value.trim(),
+                eventDate: document.getElementById('invEventDate').value,
+                eventVenue: document.getElementById('invEventVenue').value.trim(),
+                itemDesc: document.getElementById('invItemDesc').value.trim(),
+                totalProjectValue: parseFloat(document.getElementById('invTotalProjectValue').value) || 0,
+                receivedDesc: document.getElementById('invReceivedDesc').value.trim(),
+                amountReceived: parseFloat(document.getElementById('invAmountReceived').value) || 0,
+                customItems: customInvoiceItems,
+                bankName: document.getElementById('invBankName').value.trim(),
+                bankAccountNumber: document.getElementById('invBankAccountNumber').value.trim(),
+                bankAccountName: document.getElementById('invBankAccountName').value.trim(),
+                bankNotes: document.getElementById('invBankNotes').value.trim(),
+                terms: document.getElementById('invTerms').value.trim(),
+                signCity: document.getElementById('invSignCity').value.trim(),
+                signDate: document.getElementById('invSignDate').value.trim(),
+                ownerName: document.getElementById('invOwnerName').value.trim(),
+                ownerTitle: document.getElementById('invOwnerTitle').value.trim(),
+                includeStamp: document.getElementById('invIncludeStamp').checked,
+                manualSign: document.getElementById('invManualSign').checked,
+                signatureDataUrl: getSignatureDataUrl()
+            };
+
+            const idx = transactions.findIndex(t => t.id === activeInvoiceProject.id);
+            if (idx !== -1) {
+                transactions[idx].customInvoice = custom;
+                saveTransactions();
+            }
+        }
+
+        function getSignatureDataUrl() {
+            if (!sigCanvas) return '';
+            const blank = document.createElement('canvas');
+            blank.width = sigCanvas.width;
+            blank.height = sigCanvas.height;
+            if (sigCanvas.toDataURL() === blank.toDataURL()) return '';
+            return sigCanvas.toDataURL();
+        }
+
+        // ITEM TAMBAHAN CUSTOM
+        function renderCustomInvoiceItemsInputs() {
+            const container = document.getElementById('customInvoiceItemsContainer');
+            if (!container) return;
+            container.innerHTML = '';
+
+            customInvoiceItems.forEach((item, index) => {
+                const row = document.createElement('div');
+                row.className = 'flex items-center gap-2 p-2 rounded-lg bg-slate-950 border border-slate-800';
+                row.innerHTML = `
+                    <input type="text" value="${escapeHtml(item.desc || '')}" oninput="updateCustomInvoiceItemDesc(${index}, this.value)" placeholder="Keterangan item..." class="flex-1 bg-transparent text-slate-200 text-xs focus:outline-none">
+                    <input type="number" value="${item.amount || 0}" oninput="updateCustomInvoiceItemAmount(${index}, this.value)" placeholder="Nominal" class="w-24 bg-slate-900 border border-slate-700 rounded px-2 py-1 text-right text-xs text-amber-300 font-bold focus:outline-none">
+                    <button type="button" onclick="removeCustomInvoiceItem(${index})" class="text-slate-500 hover:text-rose-400 p-1" title="Hapus">
+                        <i class="fa-solid fa-trash-can text-xs"></i>
+                    </button>
+                `;
+                container.appendChild(row);
+            });
+        }
+
+        function addCustomInvoiceItem() {
+            customInvoiceItems.push({
+                desc: 'Item / Penyesuaian Tambahan',
+                amount: 0
+            });
+            renderCustomInvoiceItemsInputs();
+            renderInvoicePreview();
+        }
+
+        function removeCustomInvoiceItem(index) {
+            customInvoiceItems.splice(index, 1);
+            renderCustomInvoiceItemsInputs();
+            renderInvoicePreview();
+        }
+
+        function updateCustomInvoiceItemDesc(index, val) {
+            if (customInvoiceItems[index]) {
+                customInvoiceItems[index].desc = val;
+                renderInvoicePreview();
+            }
+        }
+
+        function updateCustomInvoiceItemAmount(index, val) {
+            if (customInvoiceItems[index]) {
+                customInvoiceItems[index].amount = parseFloat(val) || 0;
+                renderInvoicePreview();
+            }
+        }
+
+        // SIGNATURE PAD CANVAS LOGIC
+        function initSignaturePad() {
+            sigCanvas = document.getElementById('invSignatureCanvas');
+            if (!sigCanvas) return;
+            sigCtx = sigCanvas.getContext('2d');
+            sigCtx.strokeStyle = '#0f172a';
+            sigCtx.lineWidth = 2.5;
+            sigCtx.lineCap = 'round';
+            sigCtx.lineJoin = 'round';
+
+            if (signatureInitialized) return;
+            signatureInitialized = true;
+
+            function getPos(e) {
+                const rect = sigCanvas.getBoundingClientRect();
+                const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+                const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+                return {
+                    x: (clientX - rect.left) * (sigCanvas.width / rect.width),
+                    y: (clientY - rect.top) * (sigCanvas.height / rect.height)
+                };
+            }
+
+            function startDraw(e) {
+                e.preventDefault();
+                isDrawingSignature = true;
+                const pos = getPos(e);
+                sigCtx.beginPath();
+                sigCtx.moveTo(pos.x, pos.y);
+            }
+
+            function draw(e) {
+                if (!isDrawingSignature) return;
+                e.preventDefault();
+                const pos = getPos(e);
+                sigCtx.lineTo(pos.x, pos.y);
+                sigCtx.stroke();
+                updateSignaturePreview();
+            }
+
+            function stopDraw(e) {
+                if (!isDrawingSignature) return;
+                isDrawingSignature = false;
+                sigCtx.closePath();
+                updateSignaturePreview();
+            }
+
+            sigCanvas.addEventListener('mousedown', startDraw);
+            sigCanvas.addEventListener('mousemove', draw);
+            sigCanvas.addEventListener('mouseup', stopDraw);
+            sigCanvas.addEventListener('mouseleave', stopDraw);
+
+            sigCanvas.addEventListener('touchstart', startDraw, { passive: false });
+            sigCanvas.addEventListener('touchmove', draw, { passive: false });
+            sigCanvas.addEventListener('touchend', stopDraw);
+        }
+
+        function clearSignatureCanvas() {
+            if (!sigCanvas || !sigCtx) return;
+            sigCtx.clearRect(0, 0, sigCanvas.width, sigCanvas.height);
+            updateSignaturePreview();
+        }
+
+        function updateSignaturePreview() {
+            const previewImg = document.getElementById('previewSignatureImg');
+            if (!previewImg || !sigCanvas) return;
+
+            const dataUrl = getSignatureDataUrl();
+            if (dataUrl && !document.getElementById('invManualSign').checked) {
+                previewImg.src = dataUrl;
+                previewImg.classList.remove('hidden');
+            } else {
+                previewImg.src = '';
+                previewImg.classList.add('hidden');
+            }
+        }
+
+        // RENDER LIVE PREVIEW INVOICE A4
+        function renderInvoicePreview() {
+            const invNumber = document.getElementById('invNumber').value || 'INV/RMA/001';
+            const invDate = document.getElementById('invDate').value;
+            const invDueDate = document.getElementById('invDueDate').value;
+            const invStatus = document.getElementById('invStatus').value;
+
+            const customerName = document.getElementById('invCustomerName').value || '-';
+            const customerPhone = document.getElementById('invCustomerPhone').value || '-';
+            const customerAddress = document.getElementById('invCustomerAddress').value || '-';
+
+            const eventCategory = document.getElementById('invEventCategory').value || 'Wedding / Pernikahan';
+            const eventDate = document.getElementById('invEventDate').value;
+            const eventVenue = document.getElementById('invEventVenue').value || '-';
+
+            const itemDesc = document.getElementById('invItemDesc').value || 'Paket Wedding Organizer & All-In Services';
+            const contractVal = parseFloat(document.getElementById('invTotalProjectValue').value) || 0;
+            const receivedDesc = document.getElementById('invReceivedDesc').value || 'Pembayaran Telah Diterima (DP / Cicilan)';
+            const receivedVal = parseFloat(document.getElementById('invAmountReceived').value) || 0;
+
+            const bankName = document.getElementById('invBankName').value || 'Bank BCA';
+            const bankAccountNumber = document.getElementById('invBankAccountNumber').value || '123-456-7890';
+            const bankAccountName = document.getElementById('invBankAccountName').value || 'RMA Project Wedding Organizer';
+            const bankNotes = document.getElementById('invBankNotes').value || '';
+            const terms = document.getElementById('invTerms').value || '';
+
+            const signCity = document.getElementById('invSignCity').value || 'Bandung';
+            const signDate = document.getElementById('invSignDate').value || formatIndonesianDate(invDate);
+            const ownerName = document.getElementById('invOwnerName').value || 'Owner RMA Project';
+            const ownerTitle = document.getElementById('invOwnerTitle').value || 'Owner & Founder RMA Project';
+
+            const includeStamp = document.getElementById('invIncludeStamp').checked;
+            const manualSign = document.getElementById('invManualSign').checked;
+
+            // Calculations: Total Nilai Kontrak Project - Uang Masuk
+            let extraTotal = 0;
+            customInvoiceItems.forEach(item => {
+                extraTotal += (parseFloat(item.amount) || 0);
+            });
+            const subtotalContract = contractVal + extraTotal;
+            const remainingDue = Math.max(0, subtotalContract - receivedVal);
+
+            // Update calculation control summary
+            document.getElementById('calcSummaryContract').innerText = formatRupiah(contractVal);
+            document.getElementById('calcSummaryReceived').innerText = `- ${formatRupiah(receivedVal)}`;
+            document.getElementById('calcSummaryRemaining').innerText = formatRupiah(remainingDue);
+
+            // Update Sheet Elements
+            document.getElementById('prevInvNumber').innerText = invNumber;
+            document.getElementById('prevInvDate').innerText = formatIndonesianDate(invDate);
+            document.getElementById('prevInvDueDate').innerText = formatIndonesianDate(invDueDate);
+
+            // Status Badge
+            const prevInvStatus = document.getElementById('prevInvStatus');
+            prevInvStatus.innerText = invStatus;
+            if (invStatus === 'LUNAS') {
+                prevInvStatus.className = 'px-2.5 py-0.5 rounded text-[10px] font-bold uppercase bg-emerald-100 text-emerald-800 border border-emerald-300';
+            } else if (invStatus.includes('DP') || invStatus.includes('TERMIN')) {
+                prevInvStatus.className = 'px-2.5 py-0.5 rounded text-[10px] font-bold uppercase bg-amber-100 text-amber-800 border border-amber-300';
+            } else {
+                prevInvStatus.className = 'px-2.5 py-0.5 rounded text-[10px] font-bold uppercase bg-rose-100 text-rose-700 border border-rose-300';
+            }
+
+            // Customer & Event Info
+            document.getElementById('prevCustomerName').innerText = customerName;
+            document.getElementById('prevCustomerPhone').innerHTML = `<i class="fa-solid fa-phone text-slate-400 mr-1"></i>${escapeHtml(customerPhone)}`;
+            document.getElementById('prevCustomerAddress').innerHTML = `<i class="fa-solid fa-location-dot text-slate-400 mr-1"></i>${escapeHtml(customerAddress)}`;
+
+            document.getElementById('prevEventCategory').innerText = eventCategory;
+            document.getElementById('prevEventDate').innerText = formatIndonesianDate(eventDate);
+            document.getElementById('prevEventVenue').innerText = eventVenue;
+
+            // Invoice Table Rows
+            const tbody = document.getElementById('prevInvoiceItemsTbody');
+            tbody.innerHTML = '';
+
+            // Row 1: Primary Contract Item
+            const tr1 = document.createElement('tr');
+            tr1.className = 'hover:bg-slate-50/80';
+            tr1.innerHTML = `
+                <td class="py-2 px-3 text-center text-slate-400 font-mono">1</td>
+                <td class="py-2 px-3 font-semibold text-slate-800">${escapeHtml(itemDesc)}</td>
+                <td class="py-2 px-3 text-right font-bold text-slate-900">${formatRupiah(contractVal)}</td>
+            `;
+            tbody.appendChild(tr1);
+
+            // Dynamic Extra Items Rows
+            let rowNum = 2;
+            customInvoiceItems.forEach(item => {
+                const tr = document.createElement('tr');
+                tr.className = 'hover:bg-slate-50/80';
+                tr.innerHTML = `
+                    <td class="py-2 px-3 text-center text-slate-400 font-mono">${rowNum++}</td>
+                    <td class="py-2 px-3 text-slate-700">${escapeHtml(item.desc || 'Biaya Tambahan')}</td>
+                    <td class="py-2 px-3 text-right font-semibold text-slate-800">${formatRupiah(item.amount || 0)}</td>
+                `;
+                tbody.appendChild(tr);
+            });
+
+            // Table Footers
+            document.getElementById('prevSubtotalContract').innerText = formatRupiah(subtotalContract);
+            document.getElementById('prevTotalPaid').innerText = `- ${formatRupiah(receivedVal)}`;
+
+            const additionalRow = document.getElementById('prevAdditionalRow');
+            if (extraTotal > 0) {
+                additionalRow.classList.remove('hidden');
+                document.getElementById('prevAdditionalTotal').innerText = formatRupiah(extraTotal);
+            } else {
+                additionalRow.classList.add('hidden');
+            }
+
+            document.getElementById('prevRemainingDue').innerText = formatRupiah(remainingDue);
+
+            // Terbilang
+            document.getElementById('prevTerbilang').innerText = `${angkaTerbilang(remainingDue)} Rupiah`;
+
+            // Bank details
+            document.getElementById('prevBankName').innerText = bankName;
+            document.getElementById('prevBankAccountNumber').innerText = bankAccountNumber;
+            document.getElementById('prevBankAccountName').innerText = bankAccountName;
+            document.getElementById('prevBankNotes').innerText = bankNotes;
+
+            // Terms
+            document.getElementById('prevTermsList').innerText = terms;
+
+            // Owner Signature Area
+            document.getElementById('prevSignCityDate').innerText = `${signCity}, ${signDate}`;
+            document.getElementById('prevOwnerName').innerText = ownerName;
+            document.getElementById('prevOwnerTitle').innerText = ownerTitle;
+
+            // Stamp display toggle
+            const stampWrapper = document.getElementById('prevStampWrapper');
+            if (stampWrapper) {
+                stampWrapper.classList.toggle('hidden', !includeStamp);
+            }
+
+            // Manual sign vs digital signature
+            const manualLine = document.getElementById('prevManualSignLine');
+            if (manualSign) {
+                manualLine.classList.remove('hidden');
+                document.getElementById('previewSignatureImg').classList.add('hidden');
+            } else {
+                manualLine.classList.add('hidden');
+                updateSignaturePreview();
+            }
+        }
+
+        // CETAK INVOICE CUSTOMER (PDF)
+        function printCustomerInvoice() {
+            saveInvoiceCustomization();
+            document.body.classList.add('print-invoice-mode');
+            window.print();
+            setTimeout(() => {
+                document.body.classList.remove('print-invoice-mode');
+            }, 1000);
+        }
+
+        // SHARE INVOICE WHATSAPP
+        function shareInvoiceWhatsApp() {
+            saveInvoiceCustomization();
+
+            const invNumber = document.getElementById('invNumber').value || 'INV/RMA/001';
+            const customerName = document.getElementById('invCustomerName').value || 'Bpk/Ibu Customer';
+            const customerPhone = document.getElementById('invCustomerPhone').value || '';
+            const eventCategory = document.getElementById('invEventCategory').value || 'Wedding / Pernikahan';
+            const eventDate = document.getElementById('invEventDate').value || '';
+            const eventVenue = document.getElementById('invEventVenue').value || '';
+
+            const contractVal = parseFloat(document.getElementById('invTotalProjectValue').value) || 0;
+            const receivedVal = parseFloat(document.getElementById('invAmountReceived').value) || 0;
+            let extraTotal = 0;
+            customInvoiceItems.forEach(item => { extraTotal += (parseFloat(item.amount) || 0); });
+            const subtotalContract = contractVal + extraTotal;
+            const remainingDue = Math.max(0, subtotalContract - receivedVal);
+
+            const dueDate = document.getElementById('invDueDate').value || '';
+            const bankName = document.getElementById('invBankName').value || 'Bank BCA';
+            const bankAccountNumber = document.getElementById('invBankAccountNumber').value || '123-456-7890';
+            const bankAccountName = document.getElementById('invBankAccountName').value || 'RMA Project Wedding Organizer';
+
+            let waText = `*INVOICE TAGIHAN RESMI - RMA PROJECT WEDDING ORGANIZER*%0A`;
+            waText += `--------------------------------------------------%0A`;
+            waText += `*No. Invoice:* ${encodeURIComponent(invNumber)}%0A`;
+            waText += `*Kepada:* ${encodeURIComponent(customerName)}%0A`;
+            waText += `*Acara:* ${encodeURIComponent(eventCategory)}${eventDate ? ` (${encodeURIComponent(formatIndonesianDate(eventDate))})` : ''}%0A`;
+            if (eventVenue) waText += `*Venue:* ${encodeURIComponent(eventVenue)}%0A`;
+            waText += `--------------------------------------------------%0A`;
+            waText += `*RINCIAN TAGIHAN:*%0A`;
+            waText += `• Nilai Kontrak Project: ${encodeURIComponent(formatRupiah(contractVal))}%0A`;
+            if (extraTotal > 0) {
+                waText += `• Penyesuaian/Tambahan: ${encodeURIComponent(formatRupiah(extraTotal))}%0A`;
+            }
+            waText += `• Pembayaran Masuk (DP/Cicilan): -${encodeURIComponent(formatRupiah(receivedVal))}%0A`;
+            waText += `--------------------------------------------------%0A`;
+            waText += `*TOTAL SISA TAGIHAN: ${encodeURIComponent(formatRupiah(remainingDue))}*%0A`;
+            waText += `_(${encodeURIComponent(angkaTerbilang(remainingDue))} Rupiah)_%0A`;
+            if (dueDate) waText += `*Jatuh Tempo:* ${encodeURIComponent(formatIndonesianDate(dueDate))}%0A%0A`;
+            
+            waText += `*Pembayaran dapat ditransfer ke:*%0A`;
+            waText += `Bank: ${encodeURIComponent(bankName)}%0A`;
+            waText += `No. Rekening: *${encodeURIComponent(bankAccountNumber)}*%0A`;
+            waText += `A.N.: *${encodeURIComponent(bankAccountName)}*%0A%0A`;
+            waText += `_Mohon kirimkan bukti transfer ke nomor WhatsApp ini untuk konfirmasi otomatis._%0A%0A`;
+            waText += `Terima kasih atas kepercayaan Anda kepada *RMA Project Wedding Organizer*.%0A`;
+            waText += `📞 WA Resmi: *0811-1939-870*%0A`;
+            waText += `📸 IG: *@rma.project*%0A`;
+            waText += `🌐 Website: *rmaproject.id*`;
+
+            const phoneDigits = formatPhoneForWA(customerPhone);
+            const waUrl = phoneDigits ? `https://wa.me/${phoneDigits}?text=${waText}` : `https://wa.me/?text=${waText}`;
+            window.open(waUrl, '_blank');
+        }
+    </script>
+</body>
+</html>
